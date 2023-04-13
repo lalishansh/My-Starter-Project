@@ -21,14 +21,11 @@ jobs:
       - name: Setup vcpkg
         uses: lukka/run-vcpkg@v11
         with:
-          vcpkgDirectory: '${{ github.workspace }}/vcpkg'
-          vcpkgGitCommitId: 'e2ca0145eda96cb8b2f972d9ff4b7bd1619fefa0'
           vcpkgJsonGlob: '**/vcpkg.json'
-          runVcpkgInstall: false
           appendedCacheKey: ${{ matrix.os }}-${{ matrix.build_type }}
 
       - name: Configure
-        run: cmake -B build -S . -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DCMAKE_TOOLCHAIN_FILE='./vcpkg/scripts/buildsystems/vcpkg.cmake'
+        run: cmake -B build -S . -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
 
       - name: Build
         run: cmake --build build
