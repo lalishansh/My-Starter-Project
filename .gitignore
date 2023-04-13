@@ -1,0 +1,15 @@
+**/*.*
+/build/*
+/install/*
+
+!/src/**/*[.cpp]
+!/tests/**/*[.cpp]
+
+!/.clang-*
+!/CMake*[.txt, .json]
+!/vcpkg.json
+
+!/.github/workflows/*.yml
+
+!/License*
+!/.gitignore
