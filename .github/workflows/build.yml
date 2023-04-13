@@ -22,7 +22,7 @@ jobs:
         uses: lukka/run-vcpkg@v11
         with:
           vcpkgDirectory: '${{ github.workspace }}/vcpkg'
-          vcpkgGitCommitId: 'c2f29e5'
+          vcpkgGitCommitId: 'e2ca0145eda96cb8b2f972d9ff4b7bd1619fefa0'
           vcpkgJsonGlob: '**/vcpkg.json'
           runVcpkgInstall: false
           appendedCacheKey: ${{ matrix.os }}-${{ matrix.build_type }}
