@@ -19,7 +19,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Setup vcpkg
-        uses: lukka/run-vcpkg@v9
+        uses: lukka/run-vcpkg@v11
         with:
           vcpkgDirectory: '${{ github.workspace }}/vcpkg'
           vcpkgArtifactIgnoreEntries: '!vcpkg_installed/**/share/**'
