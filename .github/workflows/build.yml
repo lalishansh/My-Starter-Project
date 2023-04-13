@@ -22,8 +22,9 @@ jobs:
         uses: lukka/run-vcpkg@v11
         with:
           vcpkgDirectory: '${{ github.workspace }}/vcpkg'
-          vcpkgArtifactIgnoreEntries: '!vcpkg_installed/**/share/**'
-          vcpkgGitCommitId: '9b3bd80'
+          vcpkgGitCommitId: 'c2f29e5'
+          vcpkgJsonGlob: '**/vcpkg.json'
+          runVcpkgInstall: false
           appendedCacheKey: ${{ matrix.os }}-${{ matrix.build_type }}
 
       - name: Configure
