@@ -64,7 +64,13 @@ jobs:
           pushd "./build/$presetName"
             cmake --build . --config ${{ matrix.build_type }}
             cmake --build . --target test
+          
+            Write-Host "##############"
+            Write-Host "##############"
+            Write-Host "##############"
             cmake --install . --prefix install --component Runtime --strip --verbose
+            Write-Host "##############"
+            Write-Host "##############"
           } catch { Write-Host $_ }
           finally { popd }
           try{
