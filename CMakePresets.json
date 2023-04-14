@@ -10,7 +10,7 @@
             "name": "Windows-Environment",
             "hidden": true,
             "environment": {
-                "VCPKG_ROOT": "C:/DevDepo/vcpkg/",
+                "VCPKG_DIR": "C:/DevDepo/vcpkg/",
                 "VULKAN_SDK": "C:/VulkanSDK/1.2.182.0"
             }
         },
@@ -18,7 +18,7 @@
             "name": "Linux-Environment",
             "hidden": true,
             "environment": {
-                "VCPKG_ROOT": "/home/t-red/vcpkg/",
+                "VCPKG_DIR": "/home/t-red/vcpkg/",
                 "VULKAN_SDK": "/home/t-red/vulkan/1.3.243.0/x86_64"
             }
         },

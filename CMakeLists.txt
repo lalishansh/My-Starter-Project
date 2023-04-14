@@ -1,6 +1,27 @@
 cmake_minimum_required(VERSION 3.21)
 
-list(APPEND CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake")
+## FIND VCPKG TOOLCHAIN FILE
+set(NO_VCPKG_TOOLCHAIN_FILE TRUE)
+foreach (THE_TOOLCHAIN_FILE ${CMAKE_TOOLCHAIN_FILE})
+    if (${THE_TOOLCHAIN_FILE} MATCHES "vcpkg.cmake")
+        if (EXISTS ${THE_TOOLCHAIN_FILE})
+            set(NO_VCPKG_TOOLCHAIN_FILE FALSE)
+        endif ()
+    endif ()
+    if (NOT NO_VCPKG_TOOLCHAIN_FILE)
+        break () # there is a vcpkg toolchain file
+    endif ()
+endforeach ()
+if (${NO_VCPKG_TOOLCHAIN_FILE})
+    if (DEFINED ENV{VCPKG_ROOT} AND EXISTS "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake")
+        list(APPEND CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake")
+    elseif (DEFINED ENV{VCPKG_DIR} AND EXISTS "$ENV{VCPKG_DIR}/scripts/buildsystems/vcpkg.cmake")
+        list(APPEND CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_DIR}/scripts/buildsystems/vcpkg.cmake")
+    else ()
+        message(FATAL_ERROR "No VcPkg toolchain file found")
+    endif ()
+endif ()
+## finish block
 
 project(HelloWorldProject VERSION 1.0.0 LANGUAGES CXX)
 set(THIS_EXEC hello_world)
