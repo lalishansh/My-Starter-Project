@@ -21,8 +21,19 @@ jobs:
       - name: Setup vcpkg
         uses: lukka/run-vcpkg@v11
         with:
+          vcpkgDirectory: '${{ github.workspace }}/vcpkg'
+          vcpkgGitCommitId: 'e2ca0145eda96cb8b2f972d9ff4b7bd1619fefa0'
           vcpkgJsonGlob: '**/vcpkg.json'
+          runVcpkgInstall: false
           appendedCacheKey: ${{ matrix.os }}-${{ matrix.build_type }}
+
+      - name: Check Dir
+        shell: bash
+        run: tree -L 2
+
+      - name: check vcpkg dir for vcpkg.cmake
+        shell: bash
+        run: tree -L 2 '${{ github.workspace }}/vcpkg/scripts/'
 
       - name: Configure
         run: cmake -B build -S . -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
