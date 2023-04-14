@@ -12,7 +12,7 @@ if (-not $build_type) {
 }
 
 Write-Host "Configuring project for OS: $os and Build Type: $build_type"
-Write-Host $(cmake -B build -S . -DCMAKE_BUILD_TYPE=$build_type -DCMAKE_TOOLCHAIN_FILE=$PWD/vcpkg/scripts/buildsystems/vcpkg.cmake)
+Write-Host $(cmake -B build -S . -DCMAKE_BUILD_TYPE=$build_type)
 
 Write-Host "Building project"
 Write-Host $(cmake --build build)
