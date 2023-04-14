@@ -13,6 +13,7 @@ jobs:
       matrix:
         os: [ ubuntu-latest, windows-latest ]
         build_type: [ Debug, Release ]
+      fail-fast: false
 
     steps:
       - name: Checkout
@@ -25,14 +26,6 @@ jobs:
           vcpkgGitCommitId: 'e2ca0145eda96cb8b2f972d9ff4b7bd1619fefa0'
           vcpkgJsonGlob: '**/vcpkg.json'
           runVcpkgInstall: false
-
-      - name: Check dir
-        shell: bash
-        run: tree -L 2
-
-      - name: Check dir scripts
-        shell: bash
-        run: tree -L 2 './scripts/'
 
       - name: Build, Test and Package
         shell: pwsh
