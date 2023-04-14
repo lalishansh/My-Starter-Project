@@ -36,7 +36,7 @@ jobs:
         shell: pwsh
         run: |
           $presetName = if ($os -eq "windows-latest") { "Windows" } else { "Linux" }
-          $presetName += " x64 - Ninja - Clang @ $($build_type)"
+          $presetName += " x64 - Ninja - Clang @ ${{ matrix.build_type }}"
           cmake --preset $presetName -S . -B build
           cmake --build build --preset $presetName
           cmake --install build --preset $presetName --component Runtime --strip --verbose
