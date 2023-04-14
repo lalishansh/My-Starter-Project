@@ -17,10 +17,10 @@ Write-Host "Configuring project for OS: $os and Build Type: $build_type"
 cmake -B build -S . -DCMAKE_BUILD_TYPE=$build_type
 
 Write-Host "Building project"
-cmake --build build --verbose
+cmake --build build
 
 Write-Host "Testing project"
-cmake --build build --target test --verbose
+cmake --build build --target test
 
 Write-Host "Packaging project"
 cmake --install build --prefix install --component Runtime --strip --verbose
