@@ -11,6 +11,8 @@ if (-not $build_type) {
 	$build_type = "Debug"
 }
 
+$env:VCPKG_ROOT = "$env:VCPKG_ROOT" -replace '\\', '/'
+
 Write-Host "Configuring project for OS: $os and Build Type: $build_type"
 cmake -B build -S . -DCMAKE_BUILD_TYPE=$build_type
 
