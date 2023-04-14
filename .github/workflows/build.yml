@@ -68,7 +68,7 @@ jobs:
           } catch { Write-Host $_ }
           finally { popd }
           try{
-            tree -L 3 ./install
+            tree -L 3
           } catch { Write-Host "$_" }
 
       - name: Upload artifacts
