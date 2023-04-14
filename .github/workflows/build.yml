@@ -58,6 +58,7 @@ jobs:
             tree -L ./build
             which ninja
           } catch { Write-Host "$_" }
+          $env:VCPKG_ROOT = "$env:VCPKG_ROOT" -replace '\\', '/'
           try{
             cmake --preset $presetName
           pushd "./build/$presetName"
