@@ -26,6 +26,14 @@ jobs:
           vcpkgJsonGlob: '**/vcpkg.json'
           runVcpkgInstall: false
 
+      - name: Check dir
+        shell: bash
+        run: tree -L 2
+
+      - name: Check dir scripts
+        shell: bash
+        run: tree -L 2 './scripts/'
+
       - name: Build, Test and Package
         shell: pwsh
         run: ${{ github.workspace }}/scripts/build_test_and_package-for_remote.ps1 -os '${{ matrix.os }}' -build_type '${{ matrix.build_type }}'
