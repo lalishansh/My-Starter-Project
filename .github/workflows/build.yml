@@ -27,17 +27,9 @@ jobs:
           runVcpkgInstall: false
           appendedCacheKey: ${{ matrix.os }}-${{ matrix.build_type }}
 
-      - name: Configure
-        run: cmake -B build -S . -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
-
-      - name: Build
-        run: cmake --build build
-
-      - name: Test
-        run: cmake --build build --target test
-
-      - name: Package
-        run: cmake --install build --prefix install --component Runtime --strip --verbose
+      - name: Build, Test and Package
+        shell: pwsh
+        run: ./scripts/build_test_and_package-for_remote.ps1 -os '${{ matrix.os }}' -build_type '${{ matrix.build_type }}'
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2

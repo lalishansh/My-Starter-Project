@@ -9,6 +9,8 @@
 !/CMake*[.txt, .json]
 !/vcpkg.json
 
+!/scripts/*[.ps1]
+
 !/License*
 !/.gitignore
 
