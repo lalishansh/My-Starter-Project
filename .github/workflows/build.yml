@@ -38,8 +38,10 @@ jobs:
           $presetName = if ($os -eq "windows-latest") { "Windows" } else { "Linux" }
           $presetName += " x64 - Ninja - Clang @ ${{ matrix.build_type }}"
           cmake --preset $presetName -S . -B build
-          cmake --build build --preset $presetName
-          cmake --install build --preset $presetName --component Runtime --strip --verbose
+          ls
+          cmake --build build --config ${{ matrix.build_type }}
+          cmake --build build --target test
+          cmake --install build --prefix install --component Runtime --strip --verbose
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
