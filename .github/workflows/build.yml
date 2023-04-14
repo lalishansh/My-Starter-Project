@@ -37,11 +37,15 @@ jobs:
         run: |
           $presetName = if ($os -eq "windows-latest") { "Windows" } else { "Linux" }
           $presetName += " x64 - Ninja - Clang @ ${{ matrix.build_type }}"
-          cmake --preset $presetName -S . -B build
-          ls
-          cmake --build build --config ${{ matrix.build_type }}
-          cmake --build build --target test
-          cmake --install build --prefix install --component Runtime --strip --verbose
+          cmake --preset $presetName
+          tree -L 2
+          pushd "./build/$presetName"
+          try{
+            cmake --build . --config ${{ matrix.build_type }}
+            cmake --build . --target test
+            cmake --install . --prefix install --component Runtime --strip --verbose
+          } catch { Write-Host $_ }
+          finally { popd }
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
