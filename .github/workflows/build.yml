@@ -38,7 +38,9 @@ jobs:
           $presetName = if ($os -eq "windows-latest") { "Windows" } else { "Linux" }
           $presetName += " x64 - Ninja - Clang @ ${{ matrix.build_type }}"
           cmake --preset $presetName
-          tree -L 2
+          try{
+            tree -L ./build
+          } catch { Write-Host "$_" }
           pushd "./build/$presetName"
           try{
             cmake --build . --config ${{ matrix.build_type }}
