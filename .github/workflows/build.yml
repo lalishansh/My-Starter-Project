@@ -47,8 +47,13 @@ jobs:
       - name: Build, Test and Package
         shell: pwsh
         run: |
-          $presetName = if ($os -eq "windows-latest") { "Windows" } else { "Linux" }
-          $presetName += " x64 - Ninja - Clang @ ${{ matrix.build_type }}"
+          if ( "${{ runner.os }}" -eq "Linux" ) {
+            sudo apt-get update
+            sudo apt-get install -y cmake ninja-build
+          } elseif ( "${{ runner.os }}" -eq "Windows" ) {
+            choco install -y cmake ninja
+          }
+          $presetName = "${{ runner.os }} x64 - Ninja - Clang @ ${{ matrix.build_type }}"
           try{
             tree -L ./build
             which ninja
