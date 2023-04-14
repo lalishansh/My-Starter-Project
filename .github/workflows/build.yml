@@ -28,7 +28,7 @@ jobs:
 
       - name: Build, Test and Package
         shell: pwsh
-        run: '${{ github.workspace }}/scripts/build_test_and_package-for_remote.ps1' -os '${{ matrix.os }}' -build_type '${{ matrix.build_type }}'
+        run: ${{ github.workspace }}/scripts/build_test_and_package-for_remote.ps1 -os '${{ matrix.os }}' -build_type '${{ matrix.build_type }}'
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
