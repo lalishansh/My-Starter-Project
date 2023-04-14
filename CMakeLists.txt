@@ -25,6 +25,7 @@ add_executable(test_${THIS_EXEC}
 target_link_libraries(test_${THIS_EXEC} 
     PRIVATE 
         Boost::unit_test_framework
+        fmt::fmt
     )
 
 include(CTest)
