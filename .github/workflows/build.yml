@@ -67,6 +67,9 @@ jobs:
             cmake --install . --prefix install --component Runtime --strip --verbose
           } catch { Write-Host $_ }
           finally { popd }
+          try{
+            tree -L 3 ./install
+          } catch { Write-Host "$_" }
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
