@@ -25,12 +25,12 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Setup vcpkg
-        uses: lukka/run-vcpkg@v9
+        uses: lukka/run-vcpkg@v11
         with:
           vcpkgDirectory: '${{ github.workspace }}/vcpkg'
-          vcpkgArtifactIgnoreEntries: '!vcpkg_installed/**/share/**'
-          vcpkgGitCommitId: '9b3bd80'
-          appendedCacheKey: ${{ matrix.os }}-${{ matrix.build_type }}
+          vcpkgGitCommitId: 'e2ca0145eda96cb8b2f972d9ff4b7bd1619fefa0'
+          vcpkgJsonGlob: '**/vcpkg.json'
+          runVcpkgInstall: false
 
       - name: Build, Test and Package
         shell: pwsh
