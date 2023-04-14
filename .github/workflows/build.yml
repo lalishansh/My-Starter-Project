@@ -27,14 +27,6 @@ jobs:
           runVcpkgInstall: false
           appendedCacheKey: ${{ matrix.os }}-${{ matrix.build_type }}
 
-      - name: Check Dir
-        shell: bash
-        run: tree -L 2
-
-      - name: check vcpkg dir for vcpkg.cmake
-        shell: bash
-        run: tree -L 2 '${{ github.workspace }}/vcpkg/scripts/'
-
       - name: Configure
         run: cmake -B build -S . -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
 
