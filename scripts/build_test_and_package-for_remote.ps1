@@ -12,13 +12,13 @@ if (-not $build_type) {
 }
 
 Write-Host "Configuring project for OS: $os and Build Type: $build_type"
-Write-Host $(cmake -B build -S . -DCMAKE_BUILD_TYPE=$build_type)
+cmake -B build -S . -DCMAKE_BUILD_TYPE=$build_type
 
 Write-Host "Building project"
-Write-Host $(cmake --build build)
+cmake --build build -output-on-failure
 
 Write-Host "Testing project"
-Write-Host $(cmake --build build --target test)
+cmake --build build --target test -output-on-failure
 
 Write-Host "Packaging project"
-Write-Host $(cmake --install build --prefix install --component Runtime --strip --verbose)
+cmake --install build --prefix install --component Runtime --strip --verbose
