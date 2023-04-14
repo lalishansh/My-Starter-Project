@@ -1,0 +1,92 @@
+name: Build, Test, Package and Release
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+    types:
+      - closed
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    if: github.event_name != 'pull_request' || (github.event.pull_request.merged == true && github.head_ref == 'main')
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, windows-latest ]
+        build_type: [ Debug, Release ]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup vcpkg
+        uses: lukka/run-vcpkg@v9
+        with:
+          vcpkgDirectory: '${{ github.workspace }}/vcpkg'
+          vcpkgArtifactIgnoreEntries: '!vcpkg_installed/**/share/**'
+          vcpkgGitCommitId: '9b3bd80'
+          appendedCacheKey: ${{ matrix.os }}-${{ matrix.build_type }}
+
+      - name: Build, Test and Package
+        shell: pwsh
+        run: |
+          $presetName = if ($os -eq "windows-latest") { "Windows" } else { "Linux" }
+          $presetName += " x64 - Ninja - Clang @ $($build_type)"
+          cmake --preset $presetName -S . -B build
+          cmake --build build --preset $presetName
+          cmake --install build --preset $presetName --component Runtime --strip --verbose
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.os }}-${{ matrix.build_type }}
+          path: install
+
+  create-release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || (github.event.pull_request.merged == true && github.head_ref == 'main')
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+        with:
+          path: artifacts
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.sha }}
+          release_name: Release ${{ github.sha }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Windows Installer
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./artifacts/windows-latest-Release/install/HelloWorldProject-1.0.0-win64.exe
+          asset_name: HelloWorldProject-1.0.0-win64.exe
+          asset_content_type: application/octet-stream
+
+      - name: Upload Ubuntu Installer
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./artifacts/ubuntu-latest-Release/install/HelloWorldProject-1.0.0-Linux.deb
+          asset_name: HelloWorldProject-1.0.0-Linux.deb
+          asset_content_type: application/octet-stream
