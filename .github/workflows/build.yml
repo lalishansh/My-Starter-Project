@@ -40,6 +40,7 @@ jobs:
           cmake --preset $presetName
           try{
             tree -L ./build
+            which ninja
           } catch { Write-Host "$_" }
           pushd "./build/$presetName"
           try{
