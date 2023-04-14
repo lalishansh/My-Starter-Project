@@ -67,21 +67,17 @@ jobs:
           
             Write-Host "##############"
             Write-Host "##############"
-            Write-Host "##############"
-            cmake --install . --prefix install --component Runtime --strip --verbose
+            cmake --install .
             Write-Host "##############"
             Write-Host "##############"
           } catch { Write-Host $_ }
           finally { popd }
-          try{
-            tree -L 3
-          } catch { Write-Host "$_" }
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.os }}-${{ matrix.build_type }}
-          path: install
+          path: install/
 
   create-release:
     needs: build
