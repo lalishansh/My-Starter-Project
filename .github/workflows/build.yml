@@ -32,6 +32,16 @@ jobs:
           vcpkgJsonGlob: '**/vcpkg.json'
           runVcpkgInstall: false
 
+      - name: Set up CMake, Ninja, and required tools
+        run: |
+          if [[ "${{ runner.os }}" == "Linux" ]]; then
+            sudo apt-get update
+            sudo apt-get install -y cmake ninja-build
+          elif [[ "${{ runner.os }}" == "Windows" ]]; then
+            choco install -y cmake ninja
+            echo "C:\Program Files\CMake\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          fi
+
       - name: Build, Test and Package
         shell: pwsh
         run: |
