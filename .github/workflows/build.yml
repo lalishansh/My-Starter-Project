@@ -62,18 +62,18 @@ jobs:
             cmake --build . --target test
           
             cmake --install .
-
-            if ( "${{ runner.os }}" -eq "Linux" ) { 
-              Write-Host "$pwd/"
-            }
           } catch { Write-Host $_ }
           finally { popd }
+          
+          if ( "${{ runner.os }}" -eq "Linux" ) { 
+            tree -L 3 ./install
+          }
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.os }}-${{ matrix.build_type }}
-          path: install/
+          path: install/*/
 
   create-release:
     needs: build
@@ -92,7 +92,7 @@ jobs:
         shell: pwsh
         run: |
           if ( "${{ runner.os }}" -eq "Linux" ) { 
-            tree -L 2 ./artifacts
+            tree -L 3 ./artifacts
           }
 
       - name: Extract tag
