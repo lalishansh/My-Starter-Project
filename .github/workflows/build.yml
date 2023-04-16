@@ -64,7 +64,7 @@ jobs:
             cmake --install .
 
             if ( "${{ runner.os }}" -eq "Linux" ) { 
-              tree -L 2 ./install
+              Write-Host "$pwd/"
             }
           } catch { Write-Host $_ }
           finally { popd }
