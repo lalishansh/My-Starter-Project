@@ -54,10 +54,6 @@ jobs:
             choco install -y cmake ninja
           }
           $presetName = "${{ runner.os }} x64 - Ninja - Clang @ ${{ matrix.build_type }}"
-          try{
-            tree -L ./build
-            which ninja
-          } catch { Write-Host "$_" }
           $env:VCPKG_ROOT = "$env:VCPKG_ROOT" -replace '\\', '/'
           try{
             cmake --preset $presetName
@@ -65,11 +61,16 @@ jobs:
             cmake --build . --config ${{ matrix.build_type }}
             cmake --build . --target test
           
-            Write-Host "##############"
-            Write-Host "##############"
             cmake --install .
-            Write-Host "##############"
-            Write-Host "##############"
+
+            if ( "${{ runner.os }}" -eq "Linux" ) { 
+              tree -L 2 ./install
+            } else {
+              Get-ChildItem -Path ./install -Recurse -Force -Depth 2 -ErrorAction SilentlyContinue | ForEach-Object {
+                Write-Host $((($_.ToString()).Replace("$pwd",'.')) -replace "(\w|\s|\@|\$|\-|\.)+(\\|/)", "--- ") -NoNewline
+                if (-not $_.Directory) { Write-Host " DIR" } else { Write-Host " FILE" }
+              }
+            }
           } catch { Write-Host $_ }
           finally { popd }
 
@@ -91,6 +92,18 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           path: artifacts
+
+      - name: Verify artifacts
+        shell: pwsh
+        run: |
+          if ( "${{ runner.os }}" -eq "Linux" ) { 
+            tree -L 2 ./artifacts
+          } else {
+            Get-ChildItem -Path ./artifacts -Recurse -Force -Depth 2 -ErrorAction SilentlyContinue | ForEach-Object {
+              Write-Host $((($_.ToString()).Replace("$pwd",'.')) -replace "(\w|\s|\@|\$|\-|\.)+(\\|/)", "--- ") -NoNewline
+              if (-not $_.Directory) { Write-Host " DIR" } else { Write-Host " FILE" }
+            }
+          }
 
       - name: Extract tag
         id: extract_tag
