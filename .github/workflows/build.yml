@@ -65,11 +65,6 @@ jobs:
 
             if ( "${{ runner.os }}" -eq "Linux" ) { 
               tree -L 2 ./install
-            } else {
-              Get-ChildItem -Path ./install -Recurse -Force -Depth 2 -ErrorAction SilentlyContinue | ForEach-Object {
-                Write-Host $((($_.ToString()).Replace("$pwd",'.')) -replace "(\w|\s|\@|\$|\-|\.)+(\\|/)", "--- ") -NoNewline
-                if (-not $_.Directory) { Write-Host " DIR" } else { Write-Host " FILE" }
-              }
             }
           } catch { Write-Host $_ }
           finally { popd }
@@ -98,11 +93,6 @@ jobs:
         run: |
           if ( "${{ runner.os }}" -eq "Linux" ) { 
             tree -L 2 ./artifacts
-          } else {
-            Get-ChildItem -Path ./artifacts -Recurse -Force -Depth 2 -ErrorAction SilentlyContinue | ForEach-Object {
-              Write-Host $((($_.ToString()).Replace("$pwd",'.')) -replace "(\w|\s|\@|\$|\-|\.)+(\\|/)", "--- ") -NoNewline
-              if (-not $_.Directory) { Write-Host " DIR" } else { Write-Host " FILE" }
-            }
           }
 
       - name: Extract tag
