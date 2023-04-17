@@ -12,7 +12,7 @@ try {
 	cmake --preset $presetName
 	pushd "./build/$presetName"
 	
-	cmake --build . --config $build_type
+	cmake --build . --config $BuildType
 	cmake --build . --target test
 	
 	cpack -C Release
