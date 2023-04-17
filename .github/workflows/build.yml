@@ -118,7 +118,6 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./artifacts/ubuntu-latest-Release/HelloWorldProject-1.0.0-Linux.deb
-          asset_name: HelloWorldProject-1.0.0-Linux.deb
           asset_content_type: application/octet-stream
 
       - name: Upload Windows Installer
