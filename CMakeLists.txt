@@ -57,6 +57,7 @@ install(TARGETS ${THIS_EXEC} RUNTIME DESTINATION bin)
 # For creating installers for Windows and Linux
 include(InstallRequiredSystemLibraries)
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/License.txt")
+set(CPACK_SET_DESTDIR  "${CMAKE_CURRENT_SOURCE_DIR}/installers/")
 set(CPACK_PACKAGE_VERSION_MAJOR "${HelloWorldProject_VERSION_MAJOR}")
 set(CPACK_PACKAGE_VERSION_MINOR "${HelloWorldProject_VERSION_MINOR}")
 set(CPACK_PACKAGE_CONTACT "Ishansh Lal <t.RED.0_0@proton.me>")

@@ -39,7 +39,7 @@ jobs:
             sudo apt-get update
             sudo apt-get install -y cmake ninja-build
           } elseif ( "${{ runner.os }}" -eq "Windows" ) {
-            choco install -y cmake ninja
+            choco install -y cmake ninja nsis
           } else {
             return 1
           }
@@ -57,23 +57,27 @@ jobs:
           $env:VCPKG_ROOT = "$env:VCPKG_ROOT" -replace '\\', '/'
           try{
             cmake --preset $presetName
-          pushd "./build/$presetName"
-            cmake --build . --config ${{ matrix.build_type }}
-            cmake --build . --target test
-          
-            cmake --install .
+            pushd "./build/$presetName"
+            {
+              cmake --build . --config ${{ matrix.build_type }}
+              cmake --build . --target test
+              
+              cpack -C Release
+            }
           } catch { Write-Host $_ }
           finally { popd }
           
+          Remove-Item -Path "./installers/_CPack_Packages" -Recurse -Force -ErrorAction Ignore
+          
           if ( "${{ runner.os }}" -eq "Linux" ) { 
-            tree -L 3 ./install
+            tree -L 3 ./installers
           }
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.os }}-${{ matrix.build_type }}
-          path: install/*/
+          path: installers/*
 
   create-release:
     needs: build
