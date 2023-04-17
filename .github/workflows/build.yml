@@ -116,23 +116,19 @@ jobs:
           draft: false
           prerelease: false
 
-      - name: Get Artifact Files
-        id: get_artifact_files
-        run: |
-          files=$(ls artifacts)
-          files="${files//$'\n'/'\n'}"
-          echo "::set-output name=artifact_files::$files"
-
-      - name: Upload Release Assets
-        uses: actions/upload-release-asset@v1
+      - name: Upload All Release Artifacts
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ matrix.file }}
-          asset_name: ${{ matrix.file }}
-          asset_content_type: application/octet-stream
-        if: ${{ steps.get_artifact_files.outputs.artifact_files != '' }}
-        strategy:
-          matrix:
-            file: ${{ fromJSON('["${{ steps.get_artifact_files.outputs.artifact_files }}"]') }}
+        shell: pwsh
+        run: |
+          # Get a list of all files in the artifacts folder
+          $files = Get-ChildItem -Path ./artifacts -File
+
+          # Iterate through each file and upload it as a release asset
+          foreach ($file in $files) {
+            $filePath = $file.FullName
+            $fileName = $file.Name
+
+            echo "Uploading $fileName"
+            gh release upload ${{ steps.create_release.outputs.upload_url }} $filePath --name $fileName
+          }
