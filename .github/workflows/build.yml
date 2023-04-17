@@ -72,7 +72,9 @@ jobs:
 
       - name: Fix Files
         shell: pwsh
-        run: ./scripts/pack_to_single_file.ps1 -DirPath ./installers/ -CompressedFileNameIfRequired ${{ matrix.os }}_${{ matrix.build_type }}
+        run: |
+          $output_file = ./scripts/pack_to_single_file.ps1 -DirPath ./installers/ `
+            -CompressedFileNameIfRequired ${{ matrix.os }}_${{ matrix.build_type }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
