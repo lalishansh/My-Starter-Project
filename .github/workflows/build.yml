@@ -120,8 +120,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         run: |
-          cd artifacts
-          for file in all/*; do
+          cd artifacts/all
+          for file in *; do
             echo "Uploading $file"
-            gh release upload ${{ steps.extract_commit.outputs.commit_id }} "$file" --clobber -R ${{ github.repository }} --api-url ${{ steps.create_release.outputs.upload_url }}
+            gh release upload ${{ steps.extract_commit.outputs.commit_id }} "$file" --clobber
           done
