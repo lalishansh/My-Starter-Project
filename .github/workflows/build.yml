@@ -116,9 +116,6 @@ jobs:
           draft: false
           prerelease: false
 
-      - name: Authenticate with GitHub CLI
-        run: echo ${{ secrets.RELEASE_TOKEN }} | gh auth login --with-token
-
       - name: Upload Artifacts to Release
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
