@@ -58,20 +58,20 @@ jobs:
           try{
             cmake --preset $presetName
             pushd "./build/$presetName"
-            {
               cmake --build . --config ${{ matrix.build_type }}
               cmake --build . --target test
-              
+          
               cpack -C Release
-            }
           } catch { Write-Host $_ }
-          finally { popd }
+          finally { 
+            popd
+          }
           
-          #Remove-Item -Path "./installers/_CPack_Packages" -Recurse -Force -ErrorAction Ignore
-          
-          #if ( "${{ runner.os }}" -eq "Linux" ) { 
-          #  tree -L 3 ./installers
-          #}
+          Remove-Item -Path "./installers/_CPack_Packages" -Recurse -Force -ErrorAction Ignore
+        
+          if ( "${{ runner.os }}" -eq "Linux" ) { 
+            tree -L 3 ./installers
+          }
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
