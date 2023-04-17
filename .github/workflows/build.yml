@@ -116,19 +116,20 @@ jobs:
           draft: false
           prerelease: false
 
-      - name: Upload All Release Artifacts
-        env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
-        shell: pwsh
+      - name: Setup GitHub CLI
         run: |
-          # Get a list of all files in the artifacts folder
-          $files = Get-ChildItem -Path ./artifacts -File
+          sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0
+          sudo apt-add-repository https://cli.github.com/packages
+          sudo apt update
+          sudo apt install gh
 
-          # Iterate through each file and upload it as a release asset
-          foreach ($file in $files) {
-            $filePath = $file.FullName
-            $fileName = $file.Name
+      - name: Authenticate with GitHub CLI
+        run: echo ${{ secrets.RELEASE_TOKEN }} | gh auth login --with-token
 
-            echo "Uploading $fileName"
-            gh release upload ${{ steps.create_release.outputs.upload_url }} $filePath --name $fileName
-          }
+      - name: Upload Artifacts to Release
+        run: |
+          cd artifacts
+          for file in all/*; do
+            echo "Uploading $file"
+            gh release upload ${{ steps.extract_commit.outputs.commit_id }} "$file" --clobber -R ${{ github.repository }} --api-url ${{ steps.create_release.outputs.upload_url }}
+          done
