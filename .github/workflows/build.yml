@@ -20,10 +20,6 @@ jobs:
         os: [ ubuntu-latest, windows-latest ]
         build_type: [ Release ]
 
-    outputs:
-      windows_installer_package: ${{ steps.set_win_package.outputs.value }}
-      ubuntu_installer_package: ${{ steps.set_ubuntu_package.outputs.value }}
-
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -74,23 +70,15 @@ jobs:
           
           Remove-Item -Path "./installers/_CPack_Packages" -Recurse -Force -ErrorAction Ignore
 
+      - name: Fix Files
+        shell: pwsh
+        run: ./scripts/pack_to_single_file.ps1 -DirPath ./installers/ -CompressedFileNameIfRequired ${{ matrix.os }}_${{ matrix.build_type }}
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: ${{ matrix.os }}-${{ matrix.build_type }}
+          name: all
           path: installers/*
-
-      - name: Set Windows latest release
-        id: set_win_package
-        if: matrix.os == 'windows-latest' && matrix.build-type == 'release'
-        run:
-          echo "::set-output name=value::$(pwsh -NoProfile -Command "./scripts/package_to_single_file.ps1 -DirPath ./installers/ -CompressedFileNameIfRequired ${{ matrix.os }}_${{ matrix.build_type }}")"
-
-      - name: Set Ubuntu latest release
-        id: set_ubuntu_package
-        if: matrix.os == 'ubuntu-latest' && matrix.build-type == 'release'
-        run:
-          echo "::set-output name=value::$(pwsh -NoProfile -Command "./scripts/package_to_single_file.ps1 -DirPath ./installers/ -CompressedFileNameIfRequired ${{ matrix.os }}_${{ matrix.build_type }}")"
 
   create-release:
     needs: build
@@ -127,22 +115,19 @@ jobs:
           draft: false
           prerelease: false
 
-      - name: Upload Ubuntu Installer
-        uses: actions/upload-release-asset@v1
+      - name: Upload All Release Artifacts
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./artifacts/ubuntu-latest-Release/${{ needs.build.outputs.ubuntu_installer_package }}
-          asset_name: ${{ needs.build.outputs.ubuntu_installer_package }}
-          asset_content_type: application/octet-stream
+        shell: pwsh
+        run: |
+          # Get a list of all files in the artifacts folder
+          $files = Get-ChildItem -Path ./artifacts -File
 
-      - name: Upload Windows Installer
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./artifacts/windows-latest-Release/${{ needs.build.outputs.windows_installer_package }}
-          asset_name: ${{ needs.build.outputs.windows_installer_package }}
-          asset_content_type: application/octet-stream
+          # Iterate through each file and upload it as a release asset
+          foreach ($file in $files) {
+            $filePath = $file.FullName
+            $fileName = $file.Name
+
+            echo "Uploading $fileName"
+            gh release upload ${{ steps.create_release.outputs.id }} $filePath --name $fileName --clobber
+          }
