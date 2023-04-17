@@ -17,7 +17,7 @@ jobs:
     if: github.event_name != 'pull_request' || (github.event.pull_request.merged == true && github.head_ref == 'main')
     strategy:
       matrix:
-        os: [ ubuntu-latest, windows-latest ]
+        os: [ ubuntu-latest ]
         build_type: [ Release ]
 
     steps:
@@ -73,13 +73,12 @@ jobs:
       - name: Fix Files
         shell: pwsh
         run: |
-          $output_file = ./scripts/pack_to_single_file.ps1 -DirPath ./installers/ `
-            -CompressedFileNameIfRequired ${{ matrix.os }}_${{ matrix.build_type }}
+          Write-Host "OUTPUT_FILE: $(./scripts/pack_to_single_file.ps1 -DirPath ./installers/ `
+            -CompressedFileNameIfRequired ${{ matrix.os }}_${{ matrix.build_type }})"
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: all
           path: installers/*
 
   create-release:
@@ -117,19 +116,23 @@ jobs:
           draft: false
           prerelease: false
 
-      - name: Upload All Release Artifacts
+      - name: Get Artifact Files
+        id: get_artifact_files
+        run: |
+          files=$(ls artifacts)
+          files="${files//$'\n'/'\n'}"
+          echo "::set-output name=artifact_files::$files"
+
+      - name: Upload Release Assets
+        uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
-        shell: pwsh
-        run: |
-          # Get a list of all files in the artifacts folder
-          $files = Get-ChildItem -Path ./artifacts -File
-
-          # Iterate through each file and upload it as a release asset
-          foreach ($file in $files) {
-            $filePath = $file.FullName
-            $fileName = $file.Name
-
-            echo "Uploading $fileName"
-            gh release upload ${{ steps.create_release.outputs.id }} $filePath --name $fileName --clobber
-          }
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ matrix.file }}
+          asset_name: ${{ matrix.file }}
+          asset_content_type: application/octet-stream
+        if: ${{ steps.get_artifact_files.outputs.artifact_files != '' }}
+        strategy:
+          matrix:
+            file: ${{ fromJSON('["${{ steps.get_artifact_files.outputs.artifact_files }}"]') }}
