@@ -17,7 +17,7 @@ jobs:
     if: github.event_name != 'pull_request' || (github.event.pull_request.merged == true && github.head_ref == 'main')
     strategy:
       matrix:
-        os: [ ubuntu-latest, windows-latest ]
+        os: [ ubuntu-latest ]
         build_type: [ Release ]
 
     steps:
@@ -111,16 +111,6 @@ jobs:
           draft: false
           prerelease: false
 
-      - name: Upload Windows Installer
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./artifacts/windows-latest-Release/HelloWorldProject-1.0.0-win64.exe
-          asset_name: HelloWorldProject-1.0.0-win64.exe
-          asset_content_type: application/octet-stream
-
       - name: Upload Ubuntu Installer
         uses: actions/upload-release-asset@v1
         env:
@@ -129,4 +119,14 @@ jobs:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./artifacts/ubuntu-latest-Release/HelloWorldProject-1.0.0-Linux.deb
           asset_name: HelloWorldProject-1.0.0-Linux.deb
+          asset_content_type: application/octet-stream
+
+      - name: Upload Windows Installer
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./artifacts/windows-latest-Release/HelloWorldProject-1.0.0-win64.exe
+          asset_name: HelloWorldProject-1.0.0-win64.exe
           asset_content_type: application/octet-stream
