@@ -35,10 +35,10 @@ jobs:
       - name: Set up CMake, Ninja, and required tools
         shell: pwsh
         run: |
-          if (${{ runner.os }} -eq "Linux") {
+          if ("${{ runner.os }}" -eq "Linux") {
             sudo apt-get update
             sudo apt-get install -y cmake ninja-build
-          } elseif (${{ runner.os }} -eq "Windows") {
+          } elseif ("${{ runner.os }}" -eq "Windows") {
             choco install -y cmake ninja nsis
           } else {
             return 1
@@ -70,11 +70,7 @@ jobs:
           path: artifacts
 
       - name: Verify artifacts
-        shell: pwsh
-        run: |
-          if (${{ runner.os }} -eq "Linux") {
-            tree -L 3 ./artifacts
-          }
+        run: tree -L 3 ./artifacts
 
       - name: Create Release Tag ID
         id: create_tag
