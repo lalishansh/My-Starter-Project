@@ -14,7 +14,7 @@ on:
 jobs:
   build:
     runs-on: ${{ matrix.os }}
-    if: github.event_name != 'pull_request' || (github.event.pull_request.merged == true && github.head_ref == 'main')
+    if: github.event_name != 'pull_request' || (github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main')
     strategy:
       matrix:
         os: [ ubuntu-latest, windows-latest ]
@@ -35,10 +35,10 @@ jobs:
       - name: Set up CMake, Ninja, and required tools
         shell: pwsh
         run: |
-          if ( "${{ runner.os }}" -eq "Linux" ) {
+          if (${{ runner.os }} -eq "Linux") {
             sudo apt-get update
             sudo apt-get install -y cmake ninja-build
-          } elseif ( "${{ runner.os }}" -eq "Windows" ) {
+          } elseif (${{ runner.os }} -eq "Windows") {
             choco install -y cmake ninja nsis
           } else {
             return 1
@@ -47,34 +47,8 @@ jobs:
       - name: Build, Test and Package
         shell: pwsh
         run: |
-          if ( "${{ runner.os }}" -eq "Linux" ) {
-            sudo apt-get update
-            sudo apt-get install -y cmake ninja-build
-          } elseif ( "${{ runner.os }}" -eq "Windows" ) {
-            choco install -y cmake ninja
-          }
-          $presetName = "${{ runner.os }} x64 - Ninja - Clang @ ${{ matrix.build_type }}"
-          $env:VCPKG_ROOT = "$env:VCPKG_ROOT" -replace '\\', '/'
-          try {
-            cmake --preset $presetName
-            pushd "./build/$presetName"
-          
-              cmake --build . --config ${{ matrix.build_type }}
-              cmake --build . --target test
-          
-              cpack -C Release
-          } catch { Write-Host $_ }
-          finally { 
-            popd
-          }
-          
-          Remove-Item -Path "./installers/_CPack_Packages" -Recurse -Force -ErrorAction Ignore
-
-      - name: Fix Files
-        shell: pwsh
-        run: |
-          Write-Host "OUTPUT_FILE: $(./scripts/pack_to_single_file.ps1 -DirPath ./installers/ `
-            -CompressedFileNameIfRequired ${{ matrix.os }}_${{ matrix.build_type }})"
+          $path_to_package = ./scripts/build_test_and_package.ps1 -OS ${{ runner.os }} -BuildType ${{ matrix.build_type }}
+          Write-Host "OUTPUT_PACKAGE: $(./scripts/pack_to_single_file.ps1 -DirPath $path_to_package -CompressedFileNameIfRequired ${{ matrix.os }}_${{ matrix.build_type }})"
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
@@ -85,7 +59,7 @@ jobs:
   create-release:
     needs: build
     runs-on: ubuntu-latest
-    if: github.event_name != 'pull_request' || (github.event.pull_request.merged == true && github.head_ref == 'main')
+    if: github.event_name != 'pull_request' || (github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main')
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -98,13 +72,15 @@ jobs:
       - name: Verify artifacts
         shell: pwsh
         run: |
-          if ( "${{ runner.os }}" -eq "Linux" ) { 
+          if (${{ runner.os }} -eq "Linux") {
             tree -L 3 ./artifacts
           }
 
-      - name: Extract commit ID
-        id: extract_commit
-        run: echo "::set-output name=commit_id::$(git rev-parse --short HEAD)"
+      - name: Create Release Tag ID
+        id: create_tag
+        run: |
+          echo "::set-output name=id::$(git rev-parse --short HEAD)"
+          echo "::set-output name=version::v1.0.0"
 
       - name: Create Release
         id: create_release
@@ -112,8 +88,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         with:
-          tag_name: ${{ steps.extract_commit.outputs.commit_id }}
-          release_name: Release ${{ steps.extract_commit.outputs.commit_id }}
+          tag_name: ${{ steps.create_tag.outputs.id }}
+          release_name: Release ${{ steps.create_tag.outputs.version }}
           draft: false
           prerelease: false
 
@@ -124,5 +100,5 @@ jobs:
           cd artifacts/all
           for file in *; do
             echo "Uploading $file"
-            gh release upload ${{ steps.extract_commit.outputs.commit_id }} "$file" --clobber
+            gh release upload ${{ steps.create_tag.outputs.id }} "$file" --clobber
           done
