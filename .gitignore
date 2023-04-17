@@ -1,6 +1,7 @@
 **/*.*
 /build/*
 /install/*
+/installers/*
 
 !/src/**/*[.cpp]
 !/tests/**/*[.cpp]
