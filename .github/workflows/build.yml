@@ -67,11 +67,11 @@ jobs:
           } catch { Write-Host $_ }
           finally { popd }
           
-          Remove-Item -Path "./installers/_CPack_Packages" -Recurse -Force -ErrorAction Ignore
+          #Remove-Item -Path "./installers/_CPack_Packages" -Recurse -Force -ErrorAction Ignore
           
-          if ( "${{ runner.os }}" -eq "Linux" ) { 
-            tree -L 3 ./installers
-          }
+          #if ( "${{ runner.os }}" -eq "Linux" ) { 
+          #  tree -L 3 ./installers
+          #}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
