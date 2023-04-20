@@ -83,10 +83,10 @@
         {
             "name": "base",
             "hidden": true,
-            "binaryDir": "${sourceDir}/build/${presetName}",
-            "installDir": "${sourceDir}/install/${presetName}",
+            "binaryDir": "${sourceDir}/!build/${presetName}",
+            "installDir": "${sourceDir}/!install/${presetName}",
             "cacheVariables": {
-                "CPACK_PACKAGE_DIRECTORY": "${sourceDir}/installers"
+                "CPACK_PACKAGE_DIRECTORY": "${sourceDir}/!installers"
             }
         },
         {
