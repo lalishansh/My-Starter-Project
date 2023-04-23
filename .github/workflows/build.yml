@@ -62,7 +62,7 @@ jobs:
         run: |
           $json_content = Get-Content -Path './vcpkg.json' -Raw | ConvertFrom-Json
           echo "version-string: v$($json_content.'version-string')"
-          echo "value=$($json_content.'version-string')" >> "$GITHUB_OUTPUT"
+          echo "value: $($json_content.'version-string')" >> "$GITHUB_OUTPUT"
 
       - name: List Installer files
         run: |
