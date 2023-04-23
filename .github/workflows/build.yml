@@ -64,7 +64,7 @@ jobs:
           echo "Release Version: ${{ env.current_release_version }}"
           tree -L 3 '${{ env.path_to_package_dir }}'
 
-          echo "release_version=${{ env.current_release_version }}" >> "$GITHUB_OUTPUT"
+          echo "release_version=${{ env.current_release_version }}" >> $GITHUB_OUTPUT
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
