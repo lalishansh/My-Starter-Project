@@ -10,7 +10,7 @@ $presetName = "$OS x64 - Ninja - Clang @ $BuildType"
 $everything_cool = $false
 try {
 	cmake --preset $presetName
-	pushd "./build/$presetName"
+	pushd "./!build/$presetName"
 	
 	cmake --build . --config $BuildType
 	cmake --build . --target test
@@ -22,7 +22,7 @@ try {
 finally { popd }
 
 if ($everything_cool) {
-	Remove-Item -Path "./installers/_CPack_Packages" -Recurse -Force -ErrorAction Ignore
+	Remove-Item -Path "./!installers/_CPack_Packages" -Recurse -Force -ErrorAction Ignore
 }
 
-return "./installers/"
+return "./!installers/"
