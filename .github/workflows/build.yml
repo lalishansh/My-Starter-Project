@@ -21,7 +21,7 @@ jobs:
         build_type: [ Release ]
 
     outputs:
-      release_version: ${{ steps.get_release_version.outputs.release_version }}
+      release_version: ${{ steps.get_release_version.outputs.value }}
 
     steps:
       - name: Checkout
