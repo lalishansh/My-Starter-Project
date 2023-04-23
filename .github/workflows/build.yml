@@ -48,10 +48,12 @@ jobs:
           }
 
       - name: Build, Test and Package
+        id: package_build
         shell: pwsh
         run: |
           Invoke-Expression "./scripts/build_test_and_package.ps1 -OS ${{ runner.os }} -BuildType ${{ matrix.build_type }}" -OutVariable path_to_package
           Write-Host "OUTPUT_PACKAGE: $(./scripts/pack_to_single_file.ps1 -DirPath $path_to_package -CompressedFileNameIfRequired ${{ matrix.os }}_${{ matrix.build_type }})"
+          echo "::set-output name=package_build::$path_to_package"
 
       - name: Get Release Version
         id: get_release_version
@@ -66,7 +68,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: all
-          path: installers/*
+          path: ${{ steps.package_build.outputs.package_build }}/all
 
   create-release:
     needs: build
