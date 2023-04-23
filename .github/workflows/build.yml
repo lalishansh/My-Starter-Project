@@ -48,28 +48,30 @@ jobs:
           }
 
       - name: Build, Test and Package
-        id: package_build
-        if: matrix.os == 'ubuntu-latest' && matrix.build_type == 'Release'
         shell: pwsh
         run: |
           Invoke-Expression "./scripts/build_test_and_package.ps1 -OS ${{ runner.os }} -BuildType ${{ matrix.build_type }}" -OutVariable path_to_package
           Write-Host "OUTPUT_PACKAGE: $(./scripts/pack_to_single_file.ps1 -DirPath $path_to_package -CompressedFileNameIfRequired ${{ matrix.os }}_${{ matrix.build_type }})"
-          "value=$path_to_package" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf-8 -Append
+          "path_to_installers=$path_to_package" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf-8 -Append
 
       - name: Get Release Version
         id: get_release_version
-        run: echo "VALUE=v$(pwsh -NoProfile -Command 'Write-Host ((Get-Content -Path "./vcpkg.json" -Raw | ConvertFrom-Json)."version-string")')" >> "$GITHUB_OUTPUT"
+        shell: pwsh
+        run: |
+          $version = "v$((Get-Content -Path './vcpkg.json' -Raw | ConvertFrom-Json).'version-string')"
+          Write-Host "version-string: $version"
+          "current_release_version=$version" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf-8 -Append
 
       - name: List Installer files
         run: |
-          echo "Release Version: v${{ steps.get_release_version.outputs.value }}"
-          tree -L 3 '${{ steps.package_build.outputs.value }}'
+          echo "Release Version: v${{ env.current_release_version }}"
+          tree -L 3 '${{ steps.package_build.outputs.dir }}'
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
           name: all
-          path: ${{ steps.package_build.outputs.value }}/*
+          path: ${{ steps.package_build.outputs.dir }}/*
 
   create-release:
     needs: build
@@ -87,11 +89,10 @@ jobs:
       - name: Verify artifacts
         run: tree -L 3 ./artifacts
 
-      - name: Create Release Tag ID
-        id: create_tag
+      - name: Set Release Tag ID
         run: |
-          echo "::set-output name=id::$(git rev-parse --short HEAD)"
-          echo "::set-output name=version::${{ needs.build.outputs.release_version }}"
+          echo "current_release_tag_id=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+          echo "current_release_version=v${{ needs.build.outputs.release_version }}" >> $GITHUB_ENV
 
       - name: Create Release
         id: create_release
@@ -99,8 +100,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         with:
-          tag_name: ${{ steps.create_tag.outputs.id }}
-          release_name: Release ${{ steps.create_tag.outputs.version }}
+          tag_name: ${{ env.current_release_tag_id }}
+          release_name: Release ${{ env.current_release_version }}
           draft: false
           prerelease: false
 
