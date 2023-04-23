@@ -59,7 +59,7 @@ jobs:
         shell: pwsh
         run: |
           $json_content = Get-Content -Path './vcpkg.json' -Raw | ConvertFrom-Json
-          echo "version-string: $($jsonContent.'version-string')"
+          echo "version-string: $($json_content.'version-string')"
           echo "::set-output name=release_version::$($jsonContent.'version-string')"
 
       - name: Upload artifacts
