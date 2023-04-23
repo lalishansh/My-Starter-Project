@@ -61,12 +61,12 @@ jobs:
         shell: pwsh
         run: |
           $json_content = Get-Content -Path './vcpkg.json' -Raw | ConvertFrom-Json
-          echo "version-string: $($json_content.'version-string')"
-          echo "::set-output name=value::$($jsonContent.'version-string')"
+          echo "version-string: v$($json_content.'version-string')"
+          echo "value=$($json_content.'version-string')" >> "$GITHUB_OUTPUT"
 
       - name: List Installer files
         run: |
-          echo "Release Version: ${{ needs.build.outputs.release_version }}"
+          echo "Release Version: v${{ steps.get_release_version.outputs.value }}"
           tree -L 3 '${{ steps.package_build.outputs.package_build }}'
 
       - name: Upload artifacts
