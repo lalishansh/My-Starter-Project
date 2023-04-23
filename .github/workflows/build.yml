@@ -27,6 +27,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: Get Release Version
+        id: get_release_version
+        shell: pwsh
+        run: |
+          $json_content = Get-Content -Path './vcpkg.json' -Raw | ConvertFrom-Json
+          echo "version-string: v$($json_content.'version-string')"
+          echo "value: $($json_content.'version-string')" >> "$GITHUB_OUTPUT"
+
+      - name: Test get_release_version Value
+        run: echo ${{ steps.get_release_version.outputs.value }}
+
       - name: Setup vcpkg
         uses: lukka/run-vcpkg@v11
         with:
@@ -56,17 +67,8 @@ jobs:
           Write-Host "OUTPUT_PACKAGE: $(./scripts/pack_to_single_file.ps1 -DirPath $path_to_package -CompressedFileNameIfRequired ${{ matrix.os }}_${{ matrix.build_type }})"
           echo "::set-output name=package_build::$path_to_package"
 
-      - name: Get Release Version
-        id: get_release_version
-        shell: pwsh
-        run: |
-          $json_content = Get-Content -Path './vcpkg.json' -Raw | ConvertFrom-Json
-          echo "version-string: v$($json_content.'version-string')"
-          echo "value: $($json_content.'version-string')" >> "$GITHUB_OUTPUT"
-
       - name: List Installer files
         run: |
-          echo "Release Version: v${{ steps.get_release_version.outputs.value }}"
           tree -L 3 '${{ steps.package_build.outputs.package_build }}'
 
       - name: Upload artifacts
