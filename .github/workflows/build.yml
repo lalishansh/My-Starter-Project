@@ -29,10 +29,7 @@ jobs:
 
       - name: Get Release Version
         id: get_release_version
-        shell: pwsh
-        run: |
-          $json_content = Get-Content -Path './vcpkg.json' -Raw | ConvertFrom-Json
-          echo "VALUE=v$($json_content.'version-string')" >> "$GITHUB_OUTPUT"
+        run: echo "VALUE=v$(pwsh -NoProfile -Command 'Write-Host ((Get-Content -Path "./vcpkg.json" -Raw | ConvertFrom-Json)."version-string")')" >> "$GITHUB_OUTPUT"
 
       - name: ECHO Version
         run: echo "The Version is ${{ steps.get_release_version.outputs.VALUE }}"
