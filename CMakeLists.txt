@@ -43,11 +43,17 @@ target_link_libraries(${THIS_EXEC}
 add_executable(test_${THIS_EXEC} 
         tests/test_main.cpp
     )
-target_link_libraries(test_${THIS_EXEC} 
-    PRIVATE 
-        Boost::unit_test_framework
-        fmt::fmt
-    )
+
+get_property (target_exec_linked_libs TARGET ${THIS_EXEC} PROPERTY LINK_LIBRARIES)
+target_link_libraries(test_${THIS_EXEC} PRIVATE Boost::unit_test_framework ${target_exec_linked_libs})
+get_property (target_exec_linked_dirs TARGET ${THIS_EXEC} PROPERTY LINK_DIRECTORIES)
+if (${target_exec_linked_dirs})
+    target_link_directories(test_${THIS_EXEC} PRIVATE ${target_exec_linked_dirs})
+endif()
+get_property (target_exec_include_dirs TARGET ${THIS_EXEC} PROPERTY INCLUDE_DIRECTORIES)
+if (${target_exec_include_dirs})
+    target_link_directories(test_${THIS_EXEC} PRIVATE Boost::unit_test_framework ${target_exec_include_dirs})
+endif()
 
 include(CTest)
 add_test(NAME test_${THIS_EXEC} COMMAND test_${THIS_EXEC})

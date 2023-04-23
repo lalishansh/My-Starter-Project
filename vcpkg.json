@@ -1,15 +1,8 @@
 {
   "name": "hello-world-project",
-  "version-string": "1.0.0",
+  "version-string": "1.0.1",
   "dependencies": [
     "fmt",
-    {
-      "name": "boost-test",
-      "platform": "linux"
-    },
-    {
-      "name": "boost-test",
-      "platform": "windows"
-    }
+    "boost-test"
   ]
 }

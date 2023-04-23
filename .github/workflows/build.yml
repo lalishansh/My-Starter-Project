@@ -20,6 +20,9 @@ jobs:
         os: [ ubuntu-latest, windows-latest ]
         build_type: [ Release ]
 
+    outputs:
+      release_version: ${{ steps.get_release_version.outputs.release_version }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -50,6 +53,15 @@ jobs:
           Invoke-Expression "./scripts/build_test_and_package.ps1 -OS ${{ runner.os }} -BuildType ${{ matrix.build_type }}" -OutVariable path_to_package
           Write-Host "OUTPUT_PACKAGE: $(./scripts/pack_to_single_file.ps1 -DirPath $path_to_package -CompressedFileNameIfRequired ${{ matrix.os }}_${{ matrix.build_type }})"
 
+      - name: Get Release Version
+        id: get_release_version
+        if: matrix.os == 'ubuntu-latest' && matrix.build_type == 'Release'
+        shell: pwsh
+        run: |
+          $json_content = Get-Content -Path './vcpkg.json' -Raw | ConvertFrom-Json
+          echo "version-string: $($jsonContent.'version-string')"
+          echo "::set-output name=release_version::$($jsonContent.'version-string')"
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
@@ -76,7 +88,7 @@ jobs:
         id: create_tag
         run: |
           echo "::set-output name=id::$(git rev-parse --short HEAD)"
-          echo "::set-output name=version::v1.0.0"
+          echo "::set-output name=version::${{ needs.build.outputs.release_version }}
 
       - name: Create Release
         id: create_release
