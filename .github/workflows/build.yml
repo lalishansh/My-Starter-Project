@@ -101,6 +101,8 @@ jobs:
           release_name: Release ${{ env.current_release_version }}
           draft: false
           prerelease: false
+
+      - name: Upload artifacts to release
         run: |
           cd artifacts/all
           for file in *; do
