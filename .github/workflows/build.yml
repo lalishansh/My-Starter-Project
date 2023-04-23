@@ -103,6 +103,8 @@ jobs:
           prerelease: false
 
       - name: Upload artifacts to release
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         run: |
           cd artifacts/all
           for file in *; do
