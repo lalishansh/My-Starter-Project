@@ -89,7 +89,7 @@ jobs:
         run: |
           tree -L 3 ./artifacts
           echo "current_release_tag_id=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
-          echo "current_release_version=v${{ needs.build.outputs.release_version }}" >> $GITHUB_ENV
+          echo "current_release_version=${{ needs.build.outputs.release_version }}" >> $GITHUB_ENV
 
       - name: Create Release
         id: create_release
