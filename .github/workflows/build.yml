@@ -65,7 +65,7 @@ jobs:
       - name: List Installer files
         run: |
           echo "Release Version: v${{ env.current_release_version }}"
-          tree -L 3 '${{ steps.package_build.outputs.dir }}'
+          tree -L 3 '${{ env.path_to_installers }}'
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
