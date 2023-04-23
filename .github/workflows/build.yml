@@ -54,7 +54,7 @@ jobs:
         run: |
           Invoke-Expression "./scripts/build_test_and_package.ps1 -OS ${{ runner.os }} -BuildType ${{ matrix.build_type }}" -OutVariable path_to_package
           Write-Host "OUTPUT_PACKAGE: $(./scripts/pack_to_single_file.ps1 -DirPath $path_to_package -CompressedFileNameIfRequired ${{ matrix.os }}_${{ matrix.build_type }})"
-          echo "::set-output name=value::$path_to_package"
+          echo "::set-output name=package_build::$path_to_package"
 
       - name: Get Release Version
         id: get_release_version
@@ -62,11 +62,11 @@ jobs:
         run: |
           $json_content = Get-Content -Path './vcpkg.json' -Raw | ConvertFrom-Json
           echo "version-string: $($json_content.'version-string')"
-          echo "::set-output name=release_version::$($jsonContent.'version-string')"
+          echo "::set-output name=value::$($jsonContent.'version-string')"
 
       - name: List Installer files
         run: |
-          tree -L 3 ${{ steps.package_build.outputs.package_build }}
+          tree -L 3 '${{ steps.package_build.outputs.package_build }}'
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
