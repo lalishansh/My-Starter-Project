@@ -85,11 +85,9 @@ jobs:
         with:
           path: artifacts
 
-      - name: Verify artifacts
-        run: tree -L 3 ./artifacts
-
-      - name: Set Release Tag ID
+      - name: Verify artifacts and prepare release info
         run: |
+          tree -L 3 ./artifacts
           echo "current_release_tag_id=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
           echo "current_release_version=v${{ needs.build.outputs.release_version }}" >> $GITHUB_ENV
 
@@ -103,13 +101,9 @@ jobs:
           release_name: Release ${{ env.current_release_version }}
           draft: false
           prerelease: false
-
-      - name: Upload Artifacts to Release
-        env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         run: |
           cd artifacts/all
           for file in *; do
             echo "Uploading $file"
-            gh release upload ${{ steps.create_tag.outputs.id }} "$file" --clobber
+            gh release upload ${{ env.current_release_tag_id }} "$file" --clobber
           done
