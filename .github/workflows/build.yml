@@ -64,11 +64,16 @@ jobs:
           echo "version-string: $($json_content.'version-string')"
           echo "::set-output name=release_version::$($jsonContent.'version-string')"
 
+      - name: List files
+        run: |
+          tree -L 3 ${{ steps.package_build.outputs.package_build }}
+          tree -L 2 .
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
           name: all
-          path: ${{ steps.package_build.outputs.package_build }}/all
+          path: ${{ steps.package_build.outputs.package_build }}/*
 
   create-release:
     needs: build
