@@ -32,11 +32,7 @@ jobs:
         shell: pwsh
         run: |
           $json_content = Get-Content -Path './vcpkg.json' -Raw | ConvertFrom-Json
-          echo "version-string: v$($json_content.'version-string')"
-          echo "value: $($json_content.'version-string')" >> "$GITHUB_OUTPUT"
+          echo "VALUE=v$($json_content.'version-string')" >> "$GITHUB_OUTPUT"
 
-      - name: Set color
-        id: random-color-generator
-        run: echo "SELECTED_COLOR=green" >> "$GITHUB_OUTPUT"
-      - name: Get color
-        run: echo "The selected color is ${{ steps.random-color-generator.outputs.SELECTED_COLOR }}"
+      - name: ECHO Version
+        run: echo "The Version is ${{ steps.get_release_version.outputs.VALUE }}"
