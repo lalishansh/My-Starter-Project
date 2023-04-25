@@ -1,6 +1,7 @@
 param(
 	[string][Parameter(Mandatory)][ValidateSet("Windows", "Linux")]$OS,
-	[string][Parameter(Mandatory)][ValidateSet("Debug", "Release")]$BuildType
+	[string][Parameter(Mandatory)][ValidateSet("Debug", "Release")]$BuildType,
+	[string]$VCPKG_ROOT="$env:VCPKG_ROOT"
 )
 
 $env:VCPKG_ROOT = $env:VCPKG_ROOT -replace '\\', '/'
@@ -10,7 +11,8 @@ $presetName = "$OS x64 - Ninja - Clang @ $BuildType"
 Push-Location "$PSScriptRoot/.."
 $everything_cool = $false
 try {
-	cmake --preset $presetName
+	cmake --preset $presetName -DCMAKE_TOOLCHAIN_FILE="$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
+	
 	$installers_dir = "$PWD/!installers"
 	Push-Location "$PWD/!build/$presetName"
 	
