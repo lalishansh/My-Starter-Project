@@ -7,10 +7,11 @@
 !/tests/**/*[.cpp]
 
 !/.clang-*
-!/CMake*[.txt, .json]
+!/CMakeLists.txt
+!/CMakePresets.json
 !/vcpkg.json
 
-!/scripts/*[.ps1]
+!/scripts/*[.ps1, .cmake]
 
 !/License*
 !/.gitignore
