@@ -48,7 +48,7 @@ jobs:
             return 1
           }
 
-      - name: Build and Package
+      - name: Build, Package and Test
         shell: pwsh
         run: |
           Invoke-Expression ("
@@ -62,8 +62,6 @@ jobs:
           
           "path_to_package_dir=$path_to_package_dir" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf-8 -Append
           "current_release_version=$version" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf-8 -Append
-
-      - name: 
         
 
       - name: List Package(s) Info
