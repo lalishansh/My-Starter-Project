@@ -19,7 +19,7 @@ try {
 	cmake --build . --config $BuildType
 	cmake --build . --target test
 	
-	cpack -C Release
+	cpack -C $BuildType #OR cpack .
 	
 	$everything_cool = $true
 } catch { Write-Host $_ }
