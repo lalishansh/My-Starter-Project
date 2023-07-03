@@ -1,200 +1,122 @@
 {
-    "version": 6,
-    "cmakeMinimumRequired": {
-        "major": 3,
-        "minor": 21,
-        "patch": 0
-    },
-    "configurePresets": [
-        {
-            "name": "Windows-Environment",
-            "hidden": true,
-            "environment": {
-                "VCPKG_ROOT": "C:/DevDepo/vcpkg/",
-                "VULKAN_SDK": "C:/VulkanSDK/1.2.182.0"
-            }
-        },
-        {
-            "name": "Linux-Environment",
-            "hidden": true,
-            "environment": {
-                "VCPKG_ROOT": "/home/t-red/vcpkg/",
-                "VULKAN_SDK": "/home/t-red/vulkan/1.3.243.0/x86_64"
-            }
-        },
-        {
-            "name": "visualstudio-msvc",
-            "hidden": true,
-            "generator": "Visual Studio 17 2022",
-            "cacheVariables": {
-                "CMAKE_C_COMPILER": "cl",
-                "CMAKE_CXX_COMPILER": "cl"
-            },
-            "vendor": {
-                "jetbrains.com/clion": {
-                    "toolchain": "Visual Studio"
-                }
-            }
-        },
-        {
-            "name": "ninja-clang",
-            "hidden": true,
-            "generator": "Ninja",
-            "cacheVariables": {
-                "CMAKE_C_COMPILER": "clang",
-                "CMAKE_CXX_COMPILER": "clang++"
-            },
-            "vendor": {
-                "jetbrains.com/clion": {
-                    "toolchain": "Clang"
-                }
-            }
-        },
-        {
-            "name": "ninja-mingw",
-            "hidden": true,
-            "generator": "Ninja",
-            "cacheVariables": {
-                "CMAKE_C_COMPILER": "gcc",
-                "CMAKE_CXX_COMPILER": "g++"
-            },
-            "vendor": {
-                "jetbrains.com/clion": {
-                    "toolchain": "MinGW"
-                }
-            }
-        },
-        {
-            "name": "debug",
-            "hidden": true,
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug",
-                "CMAKE_CONFIGURATION_TYPES": "Debug"
-            }
-        },
-        {
-            "name": "release",
-            "hidden": true,
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release",
-                "CMAKE_CONFIGURATION_TYPES": "Release"
-            }
-        },
-        {
-            "name": "base",
-            "hidden": true,
-            "binaryDir": "${sourceDir}/!build/${presetName}",
-            "installDir": "${sourceDir}/!install/${presetName}",
-            "cacheVariables": {
-                "CPACK_PACKAGE_DIRECTORY": "${sourceDir}/!installers"
-            }
-        },
-        {
-            "name": "desktop-x64",
-            "hidden": true,
-            "architecture": {
-                "value": "x64",
-                "strategy": "external"
-            },
-            "toolset": {
-                "value": "host=x64",
-                "strategy": "external"
-            },
-            "cacheVariables": {
-                "PLATFORM_ARCHITECTURE": "x64"
-            },
-            "environment": {}
-        },
-        {
-            "name": "windows-base-x64",
-            "hidden": true,
-            "inherits": [ "base", "desktop-x64", "Windows-Environment" ],
-            "condition": {
-                "type": "equals",
-                "lhs": "${hostSystemName}",
-                "rhs": "Windows"
-            }
-        },
-        {
-            "name": "linux-base-x64",
-            "hidden": true,
-            "inherits": [ "base", "desktop-x64", "Linux-Environment" ],
-            "condition": {
-                "type": "equals",
-                "lhs": "${hostSystemName}",
-                "rhs": "Linux"
-            }
-        },
-        {
-            "name": "wsl-base-x64",
-            "hidden": true,
-            "inherits": [ "base", "desktop-x64", "Linux-Environment" ],
-            "condition": {
-                "type": "equals",
-                "lhs": "${hostSystemName}",
-                "rhs": "Linux"
-            },
-            "vendor": {
-                "jetbrains.com/clion": {
-                    "toolchain": "WSL"
-                }
-            }
-        },
-        {
-            "name": "Windows x64 - Visual Studio 17 - MSVC @ Release",
-            "inherits": [ "windows-base-x64", "visualstudio-msvc", "release" ]
-        },
-        {
-            "name": "Windows x64 - Visual Studio 17 - MSVC @ Debug",
-            "inherits": [ "windows-base-x64", "visualstudio-msvc", "debug" ]
-        },
-        {
-            "name": "Windows x64 - Ninja - Clang @ Release",
-            "inherits": [ "windows-base-x64", "ninja-clang", "release" ]
-        },
-        {
-            "name": "Windows x64 - Ninja - Clang @ Debug",
-            "inherits": [ "windows-base-x64", "ninja-clang", "debug" ]
-        },
-        {
-            "name": "Windows x64 - Ninja - GNU @ Release",
-            "inherits": [ "windows-base-x64", "ninja-mingw", "release" ]
-        },
-        {
-            "name": "Windows x64 - Ninja - GNU @ Debug",
-            "inherits": [ "windows-base-x64", "ninja-mingw", "debug" ]
-        },
-        {
-            "name": "Linux x64 - Ninja - Clang @ Release",
-            "inherits": [ "linux-base-x64", "ninja-clang", "release" ]
-        },
-        {
-            "name": "Linux x64 - Ninja - Clang @ Debug",
-            "inherits": [ "linux-base-x64", "ninja-clang", "debug" ]
-        },
-        {
-            "name": "Linux x64 - Ninja - GNU @ Release",
-            "inherits": [ "linux-base-x64", "ninja-mingw", "release" ]
-        },
-        {
-            "name": "Linux x64 - Ninja - GNU @ Debug",
-            "inherits": [ "linux-base-x64", "ninja-mingw", "debug" ]
-        },
-        {
-            "name": "WSL x64 - Ninja - Clang @ Release",
-            "inherits": [ "wsl-base-x64", "ninja-clang", "release" ]
-        },
-        {
-            "name": "WSL x64 - Ninja - Clang @ Debug",
-            "inherits": [ "wsl-base-x64", "ninja-clang", "debug" ]
-        },
-        {
-            "name": "WSL x64 - Ninja - GNU @ Release",
-            "inherits": [ "wsl-base-x64", "ninja-mingw", "release" ]
-        },
-        {
-            "name": "WSL x64 - Ninja - GNU @ Debug",
-            "inherits": [ "wsl-base-x64", "ninja-mingw", "debug" ]
-        }
-    ]
+	"version": 5,
+	"configurePresets": [
+		{
+			"name": "base",
+			"description": "Base configuration",
+			"hidden": true,
+			"binaryDir": "${sourceDir}/!build/${presetName}",
+			"installDir": "${sourceDir}/!install/${presetName}",
+			"cacheVariables": {
+				"PACKAGE_INSTALLERS_DIRECTORY": "${sourceDir}/!installers"
+			}
+		},
+
+		{
+			"name": "visualstudio-msvc",
+			"description": "Compile with Visual Studio 17 2022",
+			"hidden": true,
+			"generator": "Visual Studio 17 2022",
+			"cacheVariables": {
+				"CMAKE_C_COMPILER": "cl",
+				"CMAKE_CXX_COMPILER": "cl"
+			},
+			"vendor": {
+				"jetbrains.com/clion": {
+					"toolchain": "Visual Studio"
+				}
+			}
+		},
+		{
+			"name": "ninja-clang",
+			"description": "Compile with (default) LLVM-Clang",
+			"hidden": true,
+			"generator": "Ninja",
+			"cacheVariables": {
+				"CMAKE_C_COMPILER": "clang",
+				"CMAKE_CXX_COMPILER": "clang++"
+			},
+			"vendor": {
+				"jetbrains.com/clion": {
+					"toolchain": "Clang"
+				}
+			}
+		},
+		{
+			"name": "ninja-mingw",
+			"description": "Compile with (default) MinGW",
+			"hidden": true,
+			"generator": "Ninja",
+			"cacheVariables": {
+				"CMAKE_C_COMPILER": "gcc",
+				"CMAKE_CXX_COMPILER": "g++"
+			},
+			"vendor": {
+				"jetbrains.com/clion": {
+					"toolchain": "MinGW"
+				}
+			}
+		},
+
+		{
+			"name": "debug",
+			"description": "Debug build",
+			"hidden": true,
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Debug",
+				"CMAKE_CONFIGURATION_TYPES": "Debug"
+			}
+		},
+		{
+			"name": "release",
+			"description": "Release build",
+			"hidden": true,
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Release",
+				"CMAKE_CONFIGURATION_TYPES": "Release"
+			}
+		},
+
+		{
+			"name": "desktop-x64",
+			"description": "Desktop x64 build",
+			"hidden": true,
+			"inherits": "base",
+			"architecture": {
+				"value": "x64",
+				"strategy": "external"
+			},
+			"toolset": {
+				"value": "host=x64",
+				"strategy": "external"
+			},
+			"cacheVariables": {
+				"PLATFORM_ARCHITECTURE": "x64"
+			},
+			"environment": {}
+		},
+
+		{
+			"name": "windows-base-x64",
+			"description": "Windows x64 build",
+			"hidden": true,
+			"inherits": "desktop-x64",
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Windows"
+			}
+		},
+		{
+			"name": "linux-base-x64",
+			"description": "Linux x64 build",
+			"hidden": true,
+			"inherits": "desktop-x64",
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Linux"
+			}
+		}
+	]
 }
