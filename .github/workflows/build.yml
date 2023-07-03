@@ -3,13 +3,14 @@ name: Build, Test, Package and Release
 on:
   workflow_dispatch:
   push:
-    branches:
-      - main
+    # on all branches
+
   pull_request:
     types:
       - closed
     branches:
       - main
+      - develop
 
 jobs:
   build:
@@ -77,6 +78,8 @@ jobs:
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
+        # Upload artifacts only if the build is for the main branch or a pull request that is merged into the main branch
+        if: (github.ref_type == 'branch' && github.ref == 'main') || (github.event_name == 'pull_request' && github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main')
         with:
           name: all
           path: ${{ env.path_to_package_dir }}/*
@@ -84,7 +87,8 @@ jobs:
   create-release:
     needs: build
     runs-on: ubuntu-latest
-    if: github.event_name != 'pull_request' || (github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main')
+    # Create release only if the build is for the main branch or a pull request that is merged into the main branch
+    if: (github.ref_type == 'branch' && github.ref == 'main') || (github.event_name == 'pull_request' && github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main')
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -97,7 +101,7 @@ jobs:
       - name: Verify artifacts and prepare release info
         run: |
           tree -L 3 ./artifacts
-          echo "current_release_tag_id=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+          echo "current_release_tag_id=release_tag_$(git rev-parse --short HEAD)" >> $GITHUB_ENV
           echo "current_release_version=${{ needs.build.outputs.release_version }}" >> $GITHUB_ENV
 
       - name: Create Release
