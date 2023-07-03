@@ -57,11 +57,7 @@ jobs:
               -BuildType ${{ matrix.build_type }} 
               -VCPKG_ROOT ${{ github.workspace }}/vcpkg
           " -replace '\r*\n', ' ') -OutVariable path_to_package_dir
-          Invoke-Expression ("
-            ./scripts/pack_to_single_file.ps1 
-              -DirPath $path_to_package_dir 
-              -CompressedFileNameIfRequired ${{ matrix.os }}_${{ matrix.build_type }}.7z
-          " -replace '\r*\n', ' ') -OutVariable path_to_package
+
           $version = "v$((Get-Content -Path './vcpkg.json' -Raw | ConvertFrom-Json).'version-string')"
           
           "path_to_package_dir=$path_to_package_dir" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf-8 -Append
