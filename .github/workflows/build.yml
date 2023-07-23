@@ -25,17 +25,6 @@ jobs:
       release_version: ${{ steps.get_release_info.outputs.release_version }}
 
     steps:
-      - name: trying out
-        shell: pwsh
-        run: |
-
-          Invoke-Expression "
-            ./scripts/build_test_and_package.ps1
-              -OS ${{ runner.os }}
-              -BuildType ${{ matrix.build_type }} 
-              -VCPKG_ROOT ${{ github.workspace }}/vcpkg
-          ".ReplaceLineEndings("") -OutVariable path_to_package_dir
-
       - name: Checkout
         uses: actions/checkout@v2
 
@@ -62,11 +51,12 @@ jobs:
       - name: Build, Package and Test
         shell: pwsh
         run: |
+
           Invoke-Expression "
             ./scripts/build_test_and_package.ps1
               -OS ${{ runner.os }}
               -BuildType ${{ matrix.build_type }} 
-              -VCPKG_ROOT ${{ github.workspace }}/vcpkg
+              -VCPKG_ROOT `"${{ github.workspace }}/vcpkg`"
           ".ReplaceLineEndings("") -OutVariable path_to_package_dir
 
           $version = "v$((Get-Content -Path './vcpkg.json' -Raw | ConvertFrom-Json).'version-string')"
