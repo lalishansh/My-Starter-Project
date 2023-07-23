@@ -10,15 +10,17 @@ param(
 
 $env:VCPKG_ROOT = $env:VCPKG_ROOT -replace '\\', '/'
 
-$presetName = "$OSArch - $Generator - $Compiler @ $BuildType"
+$presetName = "$OS $Arch - $Generator - $Compiler @ $BuildType"
 
 Push-Location "$PSScriptRoot/.."
-$everything_cool = $false
+$everything_cool = $true
 try {
 	cmake --preset $presetName -DCMAKE_TOOLCHAIN_FILE="$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
 	
 	$installers_dir = "$PWD/!installers"
 	Push-Location "$PWD/!build/$presetName"
+
+	$everything_cool = $false
 	
 	cmake --build . --config $BuildType
 	cmake --build . --target test
@@ -28,7 +30,7 @@ try {
 	
 	$everything_cool = $true
 } catch { Write-Error $_ }
-finally { Pop-Location }
+finally { if (-not $everything_cool) { Pop-Location } }
 
 if ($everything_cool) {
 	Remove-Item -Path "$installers_dir/_CPack_Packages" -Recurse -Force -ErrorAction Ignore
