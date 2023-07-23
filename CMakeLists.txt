@@ -52,7 +52,7 @@ ADD_TESTS_FOR_TARGET(${THIS_EXEC}
         LINK_LIBRARIES
         LINK_DIRECTORIES)
 
-# Install the executable to the install directory
+# Install the executable to relative path inside the install directory
 INSTALL_TARGET_AND_ITS_DEPENDENCIES(${THIS_EXEC} "./")
 
 # Packaging information
