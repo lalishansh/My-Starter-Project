@@ -25,6 +25,17 @@ jobs:
       release_version: ${{ steps.get_release_info.outputs.release_version }}
 
     steps:
+      - name: trying out
+        shell: pwsh
+        run: |
+
+          Invoke-Expression "Write-Host `"
+            ./scripts/build_test_and_package.ps1
+              -OS ${{ runner.os }}
+              -BuildType ${{ matrix.build_type }} 
+              -VCPKG_ROOT ${{ github.workspace }}/vcpkg
+          `"".ReplaceLineEndings("")
+
       - name: Checkout
         uses: actions/checkout@v2
 
