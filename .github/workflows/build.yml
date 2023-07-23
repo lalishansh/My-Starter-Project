@@ -29,12 +29,12 @@ jobs:
         shell: pwsh
         run: |
 
-          Invoke-Expression "Write-Host `"
+          Invoke-Expression "
             ./scripts/build_test_and_package.ps1
               -OS ${{ runner.os }}
               -BuildType ${{ matrix.build_type }} 
               -VCPKG_ROOT ${{ github.workspace }}/vcpkg
-          `"".ReplaceLineEndings("") -OutVariable path_to_package_dir
+          ".ReplaceLineEndings("") -OutVariable path_to_package_dir
 
       - name: Checkout
         uses: actions/checkout@v2
