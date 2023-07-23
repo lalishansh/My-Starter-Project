@@ -51,7 +51,7 @@ jobs:
       - name: Build, Package and Test
         shell: pwsh
         run: |
-          Invoke-Expression "./scripts/build_test_and_package.ps1 -OS `"${{ runner.os }}`" -BuildType `"${{ matrix.build_type }}`" -VCPKG_ROOT `"${{ github.workspace }}/vcpkg`"".ReplaceLineEndings("").Trim() -OutVariable path_to_package_dir
+          &{./scripts/build_test_and_package.ps1 -OS "${{ runner.os }}" -BuildType "${{ matrix.build_type }}" -VCPKG_ROOT "${{ github.workspace }}/vcpkg"} -OutVariable path_to_package_dir
 
           $version = "v$((Get-Content -Path './vcpkg.json' -Raw | ConvertFrom-Json).'version-string')"
           
