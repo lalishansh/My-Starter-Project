@@ -5,7 +5,7 @@ param(
 	[string]$VCPKG_ROOT="$env:VCPKG_ROOT",
 	[string]$Arch = "x64",
 	[string]$Generator = "Ninja",
-	[string]$Compiler = "Clang",
+	[string]$Compiler = "Clang"
 )
 
 $env:VCPKG_ROOT = $env:VCPKG_ROOT -replace '\\', '/'
