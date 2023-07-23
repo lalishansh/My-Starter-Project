@@ -1,30 +1,36 @@
 param(
 	[string][Parameter(Mandatory)][ValidateSet("Windows", "Linux")]$OS,
 	[string][Parameter(Mandatory)][ValidateSet("Debug", "Release")]$BuildType,
-	[string]$VCPKG_ROOT="$env:VCPKG_ROOT"
+
+	[string]$VCPKG_ROOT="$env:VCPKG_ROOT",
+	[string]$Arch = "x64",
+	[string]$Generator = "Ninja",
+	[string]$Compiler = "Clang"
 )
 
 $env:VCPKG_ROOT = $env:VCPKG_ROOT -replace '\\', '/'
 
-$presetName = "$OS x64 - Ninja - Clang @ $BuildType"
+$presetName = "$OS $Arch - $Generator - $Compiler @ $BuildType"
 
 Push-Location "$PSScriptRoot/.."
-$everything_cool = $false
+$everything_cool = $true
 try {
 	cmake --preset $presetName -DCMAKE_TOOLCHAIN_FILE="$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
 	
 	$installers_dir = "$PWD/!installers"
 	Push-Location "$PWD/!build/$presetName"
+
+	$everything_cool = $false
 	
 	cmake --build . --config $BuildType
 	cmake --build . --target test
 	
 	cpack -C $BuildType #OR cpack .
+	ctest -C $BuildType --output-on-failure
 	
 	$everything_cool = $true
-} catch { Write-Host $_ }
-finally { popd }
-
+} catch { Write-Error $_ }
+finally { if (-not $everything_cool) { Pop-Location } }
 
 if ($everything_cool) {
 	Remove-Item -Path "$installers_dir/_CPack_Packages" -Recurse -Force -ErrorAction Ignore
