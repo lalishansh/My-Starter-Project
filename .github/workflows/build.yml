@@ -51,7 +51,8 @@ jobs:
       - name: Build, Package and Test
         shell: pwsh
         run: |
-          Invoke-Expression -Command "
+          Invoke-Expression "
+          Invoke-Expression "
             ./scripts/build_test_and_package.ps1
               -OS ${{ runner.os }}
               -BuildType ${{ matrix.build_type }} 
