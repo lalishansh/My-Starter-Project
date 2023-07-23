@@ -51,13 +51,14 @@ jobs:
       - name: Build, Package and Test
         shell: pwsh
         run: |
-          Invoke-Expression "write-host hello"
-          Invoke-Expression "
+          $run = "
             ./scripts/build_test_and_package.ps1
               -OS ${{ runner.os }}
               -BuildType ${{ matrix.build_type }} 
-              -VCPKG_ROOT `"${{ github.workspace }}/vcpkg`"
-          ".ReplaceLineEndings("") -OutVariable path_to_package_dir
+              -VCPKG_ROOT ${{ github.workspace }}/vcpkg
+          ".ReplaceLineEndings("") 
+          write-host $run
+          Invoke-Expression "$run" -OutVariable path_to_package_dir
 
           $version = "v$((Get-Content -Path './vcpkg.json' -Raw | ConvertFrom-Json).'version-string')"
           
