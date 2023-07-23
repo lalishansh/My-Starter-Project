@@ -34,7 +34,7 @@ jobs:
               -OS ${{ runner.os }}
               -BuildType ${{ matrix.build_type }} 
               -VCPKG_ROOT ${{ github.workspace }}/vcpkg
-          `"".ReplaceLineEndings("")
+          `"".ReplaceLineEndings("") -OutVariable path_to_package_dir
 
       - name: Checkout
         uses: actions/checkout@v2
