@@ -13,6 +13,8 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
+#include <ThirdParty/header.hpp>
+
 int 
 #if _WIN32
     WINAPI
@@ -21,8 +23,12 @@ int
     main(int __argc, const char *__argv[])
 #endif
 {
+    (void)__argc, (void)__argv;
+
     fmt::print("Hello, World! from VERSION {}\n",
                 HelloWorldProject_VERSION_STRING);
+
+    ThirdParty::say_hello<>();
 
     if (!glfwInit())
         return -1;

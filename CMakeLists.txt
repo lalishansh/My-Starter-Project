@@ -1,6 +1,6 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.21)
 
-include(scripts/functions.cmake)
+include(./~scripts/functions.cmake)
 FIND_VCPKG()
 
 # Enable testing for the project
