@@ -26,7 +26,7 @@ try {
 	cmake --build . --target test
 	
 	cpack -C $BuildType #OR cpack .
-	ctest -C $BuildType --output-on-failure
+	ctest -C $BuildType --rerun-failed --output-on-failure
 	
 	$everything_cool = $true
 } catch { Write-Error $_ }
