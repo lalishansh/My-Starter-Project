@@ -3,9 +3,11 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.21)
 include(scripts/functions.cmake)
 FIND_VCPKG()
 
+# Enable testing for the project
+enable_testing()
+
 # Project information
 PROJECT(HelloWorldProject VERSION ${VCPKG_MANIFEST_VERSION_STRING} LANGUAGES CXX)
-SET(THIS_EXEC hello_world)
 
 # Generate version.h file
 SET(GENERATED_SOURCE_FILES_DIR "${CMAKE_CURRENT_BINARY_DIR}/generated")
@@ -18,45 +20,54 @@ FILE(WRITE "${GENERATED_SOURCE_FILES_DIR}/version.h"
         "#define ${PROJECT_NAME}_VERSION_MINOR   ${${PROJECT_NAME}_VERSION_MINOR}\n"
         "#define ${PROJECT_NAME}_VERSION_PATCH   ${${PROJECT_NAME}_VERSION_PATCH}\n"
         "#define ${PROJECT_NAME}_VERSION_STRING \"${${PROJECT_NAME}_VERSION}\"\n"
-        )
+    )
 
-SET(CMAKE_CXX_STANDARD 17)
+SET(CMAKE_CXX_STANDARD 20)
 SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 FIND_PACKAGE(fmt   CONFIG   REQUIRED)
 FIND_PACKAGE(Boost REQUIRED COMPONENTS unit_test_framework)
 
-# MAIN TARGET
-ADD_EXECUTABLE(${THIS_EXEC}
-        src/main.cpp
+# Main target
+SET(THIS_EXEC hello_world)
+IF (NOT TARGET ${THIS_EXEC})
+    ADD_EXECUTABLE(${THIS_EXEC}
+            src/main.cpp
         )
-TARGET_LINK_LIBRARIES(${THIS_EXEC}
+    TARGET_LINK_LIBRARIES(${THIS_EXEC}
         PRIVATE
-        fmt::fmt
+            fmt::fmt
         )
-TARGET_INCLUDE_DIRECTORIES(${THIS_EXEC}
+    TARGET_INCLUDE_DIRECTORIES(${THIS_EXEC}
         PRIVATE
-        ${GENERATED_SOURCE_FILES_DIR}
+            ${GENERATED_SOURCE_FILES_DIR}
         )
-TARGET_COMPILE_OPTIONS(${THIS_EXEC} PRIVATE
-        $<$<CXX_COMPILER_ID:MSVC>:/WX /W4>
-        $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -Wpedantic -Werror -Wconversion>
+    TARGET_COMPILE_OPTIONS(${THIS_EXEC} 
+        PRIVATE
+            $<$<CXX_COMPILER_ID:MSVC>:/WX /W4>
+            $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -Wpedantic -Werror -Wconversion>
         )
-
-# TEST TARGET
-include(CTest)
-ADD_TESTS_FOR_TARGET(${THIS_EXEC}
+    
+    # TEST TARGET
+    ADD_TESTS_FOR_TARGET(${THIS_EXEC}
         INCLUDE_DIRECTORIES
         COMPILE_DEFINITIONS
         COMPILE_OPTIONS
         LINK_LIBRARIES
-        LINK_DIRECTORIES)
-
-# Install the executable to relative path inside the install directory
-INSTALL_TARGET_AND_ITS_DEPENDENCIES(${THIS_EXEC} "./")
+        LINK_DIRECTORIES
+        )
+    
+    # Install the executable to relative path inside the install directory
+    INSTALL_TARGET_AND_ITS_DEPENDENCIES(${THIS_EXEC} "./")
+ENDIF()
+    
+ADD_SUBDIRECTORY(EXEC_example)
+ADD_SUBDIRECTORY(LIB_example)
+ADD_SUBDIRECTORY(SAMPLES_example)
 
 # Packaging information
 SET(CPACK_PACKAGE_VENDOR "Ishansh Lal")
 SET(CPACK_PACKAGE_CONTACT "${CPACK_PACKAGE_VENDOR} <lalishansh@gmail.com>")
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "HelloWorld, A CMake project template")
+
 CREATE_PACKAGES_VIA_CPACK()

@@ -18,6 +18,44 @@ FUNCTION(COPY_PROPERTY_FROM_TARGET_TO_TARGET target_from target_to property_name
     ENDIF ()
 ENDFUNCTION()
 
+# add test target for target from source-files
+# params:
+#   target: the target to build tests for
+#   tests_target: the name of the test target
+#   tests_src_files: array, the source-files of the test target
+#   ...: the properties to copy from target to tests_target
+FUNCTION(ADD_TESTS_TARGET_FOR_TARGET_FROM_SRC_FILES target tests_target tests_src_files)
+    IF (NOT target)
+        MESSAGE(FATAL_ERROR "ADD_TESTS_TARGET_FOR_TARGET_FROM_SRC_FILES must be called with a target argument")
+    ELSEIF (NOT tests_target)
+        MESSAGE(FATAL_ERROR "ADD_TESTS_TARGET_FOR_TARGET_FROM_SRC_FILES must be called with a tests_target argument")
+    ELSEIF (NOT tests_src_files)
+        MESSAGE(FATAL_ERROR "ADD_TESTS_TARGET_FOR_TARGET_FROM_SRC_FILES must be called with a tests_src_files argument")
+    ENDIF ()
+
+    MESSAGE(STATUS "Building test target for ${target}")
+
+    # add test target
+    ADD_EXECUTABLE(${tests_target} ${tests_src_files})
+    IF (NOT TARGET Boost::unit_test_framework)
+        FIND_PACKAGE(Boost REQUIRED COMPONENTS unit_test_framework)
+    ENDIF ()
+
+    TARGET_LINK_LIBRARIES(${tests_target} PRIVATE Boost::unit_test_framework)
+
+    # copy properties from target to tests_target
+    FOREACH (property_name IN LISTS ARGN)
+        COPY_PROPERTY_FROM_TARGET_TO_TARGET(${target} ${tests_target} ${property_name})
+    ENDFOREACH ()
+
+    GET_TARGET_PROPERTY(target_type ${target} TYPE)
+    IF (target_type MATCHES "_+LIBRARY")
+		TARGET_LINK_LIBRARIES(${tests_target} PRIVATE ${target})
+    ENDIF()
+
+    ADD_TEST(NAME ${tests_target} COMMAND ${tests_target})
+ENDFUNCTION()
+
 # add test target for target
 # params:
 #   target: the target to build tests for
@@ -32,8 +70,6 @@ FUNCTION(ADD_TESTS_TARGET_FOR_TARGET_FROM_DIR target tests_target tests_src_dir)
     ELSEIF (NOT tests_src_dir)
         MESSAGE(FATAL_ERROR "ADD_TESTS_TARGET_FOR_TARGET_FROM_DIR must be called with a tests_src_dir argument")
     ENDIF ()
-
-    include(CTest)
     
     # get the source-dir of the target
     IF (tests_src_dir STREQUAL "")
@@ -51,20 +87,7 @@ FUNCTION(ADD_TESTS_TARGET_FOR_TARGET_FROM_DIR target tests_target tests_src_dir)
             "${tests_src_dir}/**.cppm"
             )
 
-    # add test target
-    ADD_EXECUTABLE(${tests_target} ${tests_src_files})
-    IF (NOT TARGET Boost::unit_test_framework)
-        FIND_PACKAGE(Boost REQUIRED COMPONENTS unit_test_framework)
-    ENDIF ()
-
-    TARGET_LINK_LIBRARIES(${tests_target} PRIVATE Boost::unit_test_framework)
-
-    # copy properties from target to tests_target
-    FOREACH (property_name IN LISTS ARGN)
-        COPY_PROPERTY_FROM_TARGET_TO_TARGET(${target} ${tests_target} ${property_name})
-    ENDFOREACH ()
-
-    ADD_TEST(NAME ${tests_target} COMMAND ${tests_target})
+    ADD_TESTS_TARGET_FOR_TARGET_FROM_SRC_FILES(${target} ${tests_target} ${tests_src_files} ${ARGN})
 ENDFUNCTION()
 
 # add test target for target from "./tests" dir
@@ -84,8 +107,21 @@ FUNCTION(ADD_TESTS_TARGET_FOR_TARGET target tests_target)
         MESSAGE(WARNING "Target ${target} does not have SOURCE_DIR property set, will not build tests for it")
         RETURN()
     ENDIF ()
-    SET(tests_src_dir "${target_src_dir}/tests")
-    ADD_TESTS_TARGET_FOR_TARGET_FROM_DIR(${target} ${tests_target} ${tests_src_dir} ${ARGN})
+
+    # collect <source-dir>/tests/**/*.cpp files
+    FILE(GLOB_RECURSE tests_src_files
+            "${target_src_dir}/tests/**.c"
+            "${target_src_dir}/tests/**.cc"
+            "${target_src_dir}/tests/**.cpp"
+            "${target_src_dir}/tests/**.cxx"
+            "${target_src_dir}/tests/**.cppm"
+            "${target_src_dir}/unit_tests.c"
+            "${target_src_dir}/unit_tests.cc"
+            "${target_src_dir}/unit_tests.cpp"
+            "${target_src_dir}/unit_tests.cxx"
+            "${target_src_dir}/unit_tests.cppm"
+        )
+    ADD_TESTS_TARGET_FOR_TARGET_FROM_SRC_FILES(${target} ${tests_target} ${tests_src_files} ${ARGN})
 ENDFUNCTION()
 
 # add tests for target from "./tests" dir
@@ -98,7 +134,23 @@ FUNCTION(ADD_TESTS_FOR_TARGET target)
     ENDIF ()
 
     GET_TARGET_PROPERTY(target_name ${target} NAME)
-	ADD_TESTS_TARGET_FOR_TARGET(${target} "${target_name}_tests" ${ARGN})
+	ADD_TESTS_TARGET_FOR_TARGET(${target} ${target_name}_tests ${ARGN})
+ENDFUNCTION()
+
+# add tests for target from dir
+# params:
+#   target: the target to build tests for
+#   tests_src_dir: the source-dir of the target
+#   ...: the properties to copy from target to tests_target
+FUNCTION(ADD_TESTS_FOR_TARGET_FROM_DIR target tests_src_dir)
+    IF (NOT target)
+        MESSAGE(FATAL_ERROR "ADD_TESTS_FOR_TARGET_FROM_DIR must be called with a target argument")
+    ELSEIF (NOT tests_src_dir)
+        MESSAGE(FATAL_ERROR "ADD_TESTS_FOR_TARGET_FROM_DIR must be called with a tests_src_dir argument")
+    ENDIF ()
+
+    GET_TARGET_PROPERTY(target_name ${target} NAME)
+    ADD_TESTS_TARGET_FOR_TARGET_FROM_DIR(${target} ${target_name}_tests ${tests_src_dir} ${ARGN})
 ENDFUNCTION()
 
 # find vcpkg toolchain file
@@ -140,30 +192,38 @@ FUNCTION(INSTALL_TARGET_AND_ITS_DEPENDENCIES target relative_install_dir)
         SET(relative_install_dir "./")
     ENDIF ()
 
-    INSTALL(TARGETS ${target} RUNTIME DESTINATION ${relative_install_dir})
-    # Install the dependencies to the install directory
-    GET_PROPERTY(this_target_linked_libs TARGET ${target} PROPERTY LINK_LIBRARIES)
-    FOREACH (lib IN LISTS this_target_linked_libs)
-        GET_TARGET_PROPERTY(lib_type ${lib} TYPE)
-        IF (lib_type STREQUAL "INTERFACE_LIBRARY" OR lib_type STREQUAL "STATIC_LIBRARY")
-            CONTINUE()
-        ENDIF ()
+    # Check if the target is an executable
+    GET_TARGET_PROPERTY(target_type ${target} TYPE)
+    IF (target_type STREQUAL "EXECUTABLE")
+        INSTALL(TARGETS ${target} RUNTIME DESTINATION ${relative_install_dir})
 
-        GET_TARGET_PROPERTY(lib_location ${lib} LOCATION)
-        IF (NOT lib_location)
-            IF (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-                GET_TARGET_PROPERTY(lib_location ${lib} LOCATION_DEBUG)
-            ELSE ()
-                GET_TARGET_PROPERTY(lib_location ${lib} LOCATION_RELEASE)
+        # Install the dependencies to the install directory
+        GET_PROPERTY(this_target_linked_libs TARGET ${target} PROPERTY LINK_LIBRARIES)
+        FOREACH (lib IN LISTS this_target_linked_libs)
+            GET_TARGET_PROPERTY(lib_type ${lib} TYPE)
+            IF (lib_type STREQUAL "INTERFACE_LIBRARY" OR lib_type STREQUAL "STATIC_LIBRARY")
+                CONTINUE()
             ENDIF ()
-        ENDIF ()
-        IF (lib_location)
-            INSTALL(FILES ${lib_location} DESTINATION ${relative_install_dir} CONFIGURATIONS ${CMAKE_BUILD_TYPE})
-        ENDIF ()
-    ENDFOREACH ()
+
+            SET(lib_location)
+            IF (NOT lib_location)
+                STRING(TOUPPER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE_UPPER)
+                GET_TARGET_PROPERTY(lib_location ${lib} LOCATION_${CMAKE_BUILD_TYPE_UPPER})
+            ENDIF ()
+            IF (NOT lib_location)
+				GET_TARGET_PROPERTY(lib_location ${lib} LOCATION)
+            ENDIF ()
+
+            IF (lib_location)
+                INSTALL(FILES ${lib_location} DESTINATION ${relative_install_dir} CONFIGURATIONS ${CMAKE_BUILD_TYPE})
+            ENDIF ()
+        ENDFOREACH ()
+    ELSE ()
+        MESSAGE (FATAL_ERROR "Target ${target} is not an executable")
+        # TODO: support other target types
+
+    ENDIF ()
 ENDFUNCTION()
-
-
 
 # create packages for distribution
 MACRO(CREATE_PACKAGES_VIA_CPACK)
