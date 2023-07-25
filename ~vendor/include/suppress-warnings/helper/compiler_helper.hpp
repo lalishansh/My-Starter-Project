@@ -1,51 +1,26 @@
 #pragma once
 
 // Tip: This file is for compiler identification
+//      and should not be used for anything else.
 
-// defaults
-#define UNKNOWN_COMPILER 1
-#define COMPILER_HAS_WARNING(x) 0
-#define SUPPRESS_WARNING(x)
-
-#define ON_GCC_COMPILER(x)
-#if defined(__GNUC__) && defined(UNKNOWN_COMPILER)
-    #define GCC_COMPILER 1
-
-    #undef  UNKNOWN_COMPILER
-    #undef  COMPILER_HAS_WARNING
-    #undef  SUPPRESS_WARNING
-    #undef  ON_GCC_COMPILER
-    #define COMPILER_HAS_WARNING(x) __has_warning(x)
-    #define SUPPRESS_WARNING(x) _Pragma("GCC diagnostic ignored " x)
-    #define ON_GCC_COMPILER(x) x
+#if defined(__GNUC__)
+	#define COMPILER_GCC                  1
+	#define PRAGMIFY(x)                   _Pragma (#x)
+	#define COMPILER_WARNING_AVAILABLE(x) __has_warning (x)
+	#define COMPILER_WARNING_DISABLE(x)   PRAGMIFY (GCC diagnostic ignored x)
+#elif defined(__clang__)
+	#define COMPILER_CLANG                1
+	#define PRAGMIFY(x)                   _Pragma (#x)
+	#define COMPILER_WARNING_AVAILABLE(x) __has_warning (x)
+	#define COMPILER_WARNING_DISABLE(x)   PRAGMIFY (clang diagnostic ignored x)
+#elif defined(_MSC_VER)
+	#define COMPILER_MSVC                 1
+	#define PRAGMIFY(x)                   __pragma (x)
+	#define COMPILER_WARNING_AVAILABLE(x) 1
+	#define COMPILER_WARNING_DISABLE(x)   PRAGMIFY (warning (disable : x))
+#else
+	#error "Unknown compiler"
 #endif
-
-#define ON_CLANG_COMPILER(x)
-#if defined(__clang__) && defined(UNKNOWN_COMPILER)
-    #define CLANG_COMPILER 1
-
-    #undef  UNKNOWN_COMPILER
-    #undef  COMPILER_HAS_WARNING
-    #undef  SUPPRESS_WARNING
-    #undef  ON_CLANG_COMPILER
-    #define COMPILER_HAS_WARNING(x) __has_warning(x)
-    #define SUPPRESS_WARNING(x) _Pragma("clang diagnostic ignored " x)
-    #define ON_CLANG_COMPILER(x) x
-#endif
-
-#define ON_MSVC_COMPILER(x)
-#if defined(_MSC_VER) && defined(UNKNOWN_COMPILER)
-    #define MSVC_COMPILER 1
-
-    #undef  UNKNOWN_COMPILER
-    #undef  COMPILER_HAS_WARNING
-    #undef  SUPPRESS_WARNING
-    #undef  ON_MSVC_COMPILER
-    #define COMPILER_HAS_WARNING(x) 1
-    #define SUPPRESS_WARNING(x) __pragma(warning(disable: x))
-    #define ON_MSVC_COMPILER(x) x
-#endif
-
 
 #if defined(__cplusplus) || defined(c_plusplus) || defined(__CPLUSPLUS__)
     #define CPP_COMPILER 1
