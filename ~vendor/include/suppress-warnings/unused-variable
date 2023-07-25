@@ -1,0 +1,19 @@
+#if !defined(WARNINGS_SUPPRESSION_ACTIVE)
+	#error "File included directly outside of warnings suppression scope."
+#endif
+
+#if !WARNINGS_SUPPRESSION_ACTIVE
+	#undef WARNINGS_SUPPRESSED_FOR_UNUSED_VARIABLE
+#elif !defined(WARNINGS_SUPPRESSED_FOR_UNUSED_VARIABLE)
+	#define  WARNINGS_SUPPRESSED_FOR_UNUSED_VARIABLE
+	
+	#define __warning_id__ \
+		ON_CLANG_COMPILER("-Wunused-variable") \
+		ON_MSVC_COMPILER(4189) \
+	//
+
+	#if COMPILER_HAS_WARNING(__warning_id__)
+		SUPPRESS_WARNING(__warning_id__)
+	#endif
+	#undef __warning_id__
+#endif

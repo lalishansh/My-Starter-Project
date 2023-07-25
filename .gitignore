@@ -26,6 +26,9 @@
 # Include common project files
 !/~vendor/include/**/*[.h, .hh, .hpp, hxx, .inl, .ixx]
 
+!/~vendor/include/suppress-warnings/[README|Readme|readme]*
+!/~vendor/include/suppress-warnings/scripts/*.ps1
+
 !/.clang-*
 !/CMakeLists.txt
 !/CMakePresets.json
