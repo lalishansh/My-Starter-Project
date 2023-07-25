@@ -36,15 +36,25 @@ jobs:
           vcpkgJsonGlob: '**/vcpkg.json'
           runVcpkgInstall: false
 
-      - name: Set up CMake, Ninja, and required tools
+      - name: Set up Clang, CMake, Ninja, and required tools
         shell: pwsh
         run: |
           if ("${{ runner.os }}" -eq "Linux") {
+            # Install LLVM.ClangToolchain 16
+            wget https://apt.llvm.org/llvm.sh
+            chmod +x llvm.sh
+            sudo ./llvm.sh 16
+
+            # Install CMake and Ninja
             sudo apt-get update
             sudo apt-get install -y cmake ninja-build
+
             # Install dependencies for X11
             sudo apt install libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev
           } elseif ("${{ runner.os }}" -eq "Windows") {
+            # Install LLVM.ClangToolchain
+            choco install llvm
+            # Install CMake and Ninja
             choco install -y cmake ninja nsis
           } else {
             return 1
