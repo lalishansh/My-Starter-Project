@@ -59,6 +59,7 @@ jobs:
           } else {
             return 1
           }
+          clang --version
 
       - name: Build, Package and Test
         shell: pwsh
