@@ -46,16 +46,16 @@ TARGET_INCLUDE_DIRECTORIES(${example_target}
 TARGET_COMPILE_OPTIONS(${example_target}
     PRIVATE
         $<$<CXX_COMPILER_ID:MSVC>:/WX /W4>
-        $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -Wpedantic -Wconversion>
+        $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -Wpedantic -Wconversion -Werror>
     )
 TARGET_COMPILE_DEFINITIONS(${example_target}
     PRIVATE
         $<$<CXX_COMPILER_ID:MSVC>:_CRT_SECURE_NO_WARNINGS>
     )
 
-# from third_party dir
+# from ~vendor dir
 TARGET_INCLUDE_DIRECTORIES(${example_target} PRIVATE
-        ${CMAKE_SOURCE_DIR}/third_party/include
+        ${CMAKE_SOURCE_DIR}/~vendor/include
     )
 
 # VcPkg packages

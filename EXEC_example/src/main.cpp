@@ -1,8 +1,6 @@
-#include <fmt/core.h>
+#include "version.h"
 
 #include <iostream>
-
-#include "version.h"
 
 #if _WIN32
 #include <Windows.h>
@@ -10,9 +8,13 @@
 #undef max
 #endif
 
+#include <fmt/core.h>
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
+#include <ThirdParty/header.hpp>
+
+void test_warning_suppression();
 int 
 #if _WIN32
     WINAPI
@@ -21,8 +23,12 @@ int
     main(int __argc, const char *__argv[])
 #endif
 {
+    (void)__argc, (void)__argv;
+
     fmt::print("Hello, World! from VERSION {}\n",
                 HelloWorldProject_VERSION_STRING);
+
+    ThirdParty::say_hello<>();
 
     if (!glfwInit())
         return -1;
@@ -41,3 +47,15 @@ int
     std::cin.ignore();
     return 0;
 }
+
+#include <suppress-warnings/push>
+#include <suppress-warnings/unused-variable>
+#include <suppress-warnings/literal-conversion>
+#include <suppress-warnings/macro-redefined>
+void test_warning_suppression() {
+    bool unused_var = true;
+    int int_from_float = 1.1f;
+}
+#define REDEFINE_A_MACRO 1
+#define REDEFINE_A_MACRO 2
+#include <suppress-warnings/pop>

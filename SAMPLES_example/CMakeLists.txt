@@ -86,9 +86,9 @@ FUNCTION(BUILD_EXAMPLE example_dir)
             $<$<CXX_COMPILER_ID:MSVC>:_CRT_SECURE_NO_WARNINGS>
         )
     
-    # from third_party dir
+    # from ~vendor dir
     TARGET_INCLUDE_DIRECTORIES(${example_target} PRIVATE
-            ${CMAKE_SOURCE_DIR}/third_party/include
+            ${CMAKE_SOURCE_DIR}/~vendor/include
         )
     
     # VcPkg packages

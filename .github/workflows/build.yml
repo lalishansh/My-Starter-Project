@@ -36,12 +36,13 @@ jobs:
           vcpkgJsonGlob: '**/vcpkg.json'
           runVcpkgInstall: false
 
-      - name: Set up CMake, Ninja, and required tools
+      - name: Set up Clang, CMake, Ninja, and required tools
         shell: pwsh
         run: |
           if ("${{ runner.os }}" -eq "Linux") {
             sudo apt-get update
             sudo apt-get install -y cmake ninja-build
+
             # Install dependencies for X11
             sudo apt install libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev
           } elseif ("${{ runner.os }}" -eq "Windows") {
@@ -49,12 +50,13 @@ jobs:
           } else {
             return 1
           }
+          clang --version
 
       - name: Build, Package and Test
         shell: pwsh
         run: |
           Invoke-Expression "
-            ./scripts/build_test_and_package.ps1
+            ./~scripts/build_test_and_package.ps1
               -OS ${{ runner.os }}
               -BuildType ${{ matrix.build_type }} 
               -VCPKG_ROOT ${{ github.workspace }}/vcpkg
