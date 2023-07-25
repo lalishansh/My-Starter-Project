@@ -4,7 +4,7 @@
 
 // defaults
 #define UNKNOWN_COMPILER 1
-#define COMPILER_HAS_WARNING(x) 1
+#define COMPILER_HAS_WARNING(x) 0
 #define PRAGMIFY(x) 
 #define SUPPRESS_WARNING(x)
 
@@ -18,7 +18,7 @@
     #undef  SUPPRESS_WARNING
     #undef  ON_GCC_COMPILER
     #define COMPILER_HAS_WARNING(x) __has_warning(x)
-    #define PRAGMIFY(x) _Pragma(x)
+    #define PRAGMIFY(x) _Pragma(#x)
     #define SUPPRESS_WARNING(x) PRAGMIFY(GCC diagnostic ignored x)
     #define ON_GCC_COMPILER(x) x
 #endif
@@ -33,7 +33,7 @@
     #undef  SUPPRESS_WARNING
     #undef  ON_CLANG_COMPILER
     #define COMPILER_HAS_WARNING(x) __has_warning(x)
-    #define PRAGMIFY(x) _Pragma(x)
+    #define PRAGMIFY(x) _Pragma(#x)
     #define SUPPRESS_WARNING(x) PRAGMIFY(clang diagnostic ignored x)
     #define ON_CLANG_COMPILER(x) x
 #endif

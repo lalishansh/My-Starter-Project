@@ -8,7 +8,7 @@
 	#define  WARNINGS_SUPPRESSED_FOR_MACRO_REDEFINED
 
 	#define __warning_id__         \
-		ON_CLANG_COMPILER("macro-redefined") \
+		ON_CLANG_COMPILER("-Wmacro-redefined") \
 		ON_MSVC_COMPILER(4005) \
 	//	ON_GCC_COMPILER("macro-redefined") \
 	//
