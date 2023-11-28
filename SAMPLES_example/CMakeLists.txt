@@ -116,7 +116,7 @@ ENDFUNCTION()
 
 # for every example in the examples directory
 # add a test target and an example target
-FILE(GLOB example_dirs ${CMAKE_CURRENT_SOURCE_DIR}/*)
+FILE(GLOB example_dirs ${CMAKE_CURRENT_SOURCE_DIR}/*/)
 FOREACH (example_dir IN LISTS example_dirs)
     IF (IS_DIRECTORY ${example_dir})
         BUILD_EXAMPLE(${example_dir})

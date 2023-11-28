@@ -1,5 +1,13 @@
 {
 	"version": 5,
+	"cmakeMinimumRequired": {
+		"major": 3,
+		"minor": 23,
+		"patch": 0
+	},
+	"include": [
+		"ENV.json"
+	],
 	"configurePresets": [
 		{
 			"name": "base",
@@ -117,6 +125,48 @@
 				"lhs": "${hostSystemName}",
 				"rhs": "Linux"
 			}
+		},
+
+		{
+			"name": "Windows x64 - Visual Studio 17 - MSVC @ Release",
+			"inherits": [ "Windows-Environment", "windows-base-x64", "visualstudio-msvc", "release" ]
+		},
+		{
+			"name": "Windows x64 - Visual Studio 17 - MSVC @ Debug",
+			"inherits": [ "Windows-Environment", "windows-base-x64", "visualstudio-msvc", "debug" ]
+		},
+		{
+			"name": "Windows x64 - Ninja - Clang @ Release",
+			"inherits": [ "Windows-Environment", "windows-base-x64", "ninja-clang", "release" ]
+		},
+		{
+			"name": "Windows x64 - Ninja - Clang @ Debug",
+			"inherits": [ "Windows-Environment", "windows-base-x64", "ninja-clang", "debug" ]
+		},
+		{
+			"name": "Windows x64 - Ninja - GNU @ Release",
+			"inherits": [ "Windows-Environment", "windows-base-x64", "ninja-mingw", "release" ]
+		},
+		{
+			"name": "Windows x64 - Ninja - GNU @ Debug",
+			"inherits": [ "Windows-Environment", "windows-base-x64", "ninja-mingw", "debug" ]
+		},
+		{
+			"name": "Linux x64 - Ninja - Clang @ Release",
+			"inherits": [ "Linux-Environment", "linux-base-x64", "ninja-clang", "release" ]
+		},
+		{
+			"name": "Linux x64 - Ninja - Clang @ Debug",
+			"inherits": [ "Linux-Environment", "linux-base-x64", "ninja-clang", "debug" ]
+		},
+		{
+			"name": "Linux x64 - Ninja - GNU @ Release",
+			"inherits": [ "Linux-Environment", "linux-base-x64", "ninja-mingw", "release" ]
+		},
+		{
+			"name": "Linux x64 - Ninja - GNU @ Debug",
+			"inherits": [ "Linux-Environment", "linux-base-x64", "ninja-mingw", "debug" ]
 		}
+
 	]
 }

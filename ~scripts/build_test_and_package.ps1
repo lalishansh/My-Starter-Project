@@ -8,14 +8,18 @@ param(
 	[string]$Compiler = "Clang"
 )
 
-$env:VCPKG_ROOT = $env:VCPKG_ROOT -replace '\\', '/'
+$VCPKG_ROOT = $VCPKG_ROOT -replace '\\', '/'
 
 $presetName = "$OS $Arch - $Generator - $Compiler @ $BuildType"
 
 Push-Location "$PSScriptRoot/.."
 $everything_cool = $true
 try {
-	cmake --preset $presetName -DCMAKE_TOOLCHAIN_FILE="$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
+	if ($VCPKG_ROOT.Length -eq 0) {
+		cmake --preset $presetName
+	} else {
+		cmake --preset $presetName -DCMAKE_TOOLCHAIN_FILE="$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
+	}
 	
 	$installers_dir = "$PWD/!installers"
 	Push-Location "$PWD/!build/$presetName"
